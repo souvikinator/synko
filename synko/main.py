@@ -11,13 +11,10 @@ App = Synko()
 
 
 @click.group()
-@click.version_option(version=APP_NAME, prog_name=APP_NAME)
+@click.version_option(version=APP_VERISON, prog_name=APP_NAME)
 def main():
     # initialize app here
     App.init_app()
-    # print(App.get_appdata(), end="\n\n")
-    # print(App.get_metadata())
-    # perform all checks
 
 
 # add command
@@ -26,9 +23,7 @@ def main():
 @click.argument("paths", nargs=-1)
 def add(name, paths):
     """
-    0. validate paths
-    1. perform symlink and stuff
-    2. update/add paths in track data
+    add configuration path for syncing
     """
 
     paths = list(set(paths))
@@ -44,7 +39,8 @@ def add(name, paths):
     # check if paths already exists in track file?
     App.check_duplicate_paths(paths)
 
-    # perform symlink
+    # form links
+    utils.link_all(paths)
 
     # update track data and file
     track_data.setdefault(name, dict())
@@ -61,7 +57,7 @@ def add(name, paths):
 @click.option("--configs", "-c", type=bool, default=True)
 # @click.option("--devices", "-d", type=bool, default=False)
 def index(configs):
-    """about this command"""
+    """list all the donfig files added to synko"""
     track_data = App.get_track_data()
 
     if len(track_data) == 0:
@@ -75,10 +71,34 @@ def index(configs):
 # remove command
 # TODO: allow removing files
 @main.command()
-@click.argument("cfgName", nargs=1)
-def remove(configs, devices):
-    """about this command"""
-    pass
+@click.argument("name", nargs=1)
+@click.option("--all", "-a", type=bool, default=True)
+def remove(name, all):
+    """remove specific config file from synko"""
+
+    track_data = App.get_track_data()
+    device_id = App.device_id()
+
+    if name not in track_data:
+        utils.error(f"config name '{name}' not found")
+
+    if device_id not in track_data[name]:
+        utils.error(f"nothing to remove in config name '{name}'")
+
+    config_paths = track_data[name][device_id] or []
+
+    if len(config_paths) == 0:
+        utils.error(f"nothing to remove in config name '{name}'")
+
+    # ask for user input: select config file to delete
+    to_be_removed_paths = utils.select_options(config_paths)
+
+    if len(to_be_removed_paths) == 0:
+        utils.error(f"No options selected!\nAborting remove")
+
+    # TODO:
+    App.unlink_all(to_be_removed_paths)
+    # update track data
 
 
 if __name__ == "__main__":
