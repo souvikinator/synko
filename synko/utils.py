@@ -1,10 +1,8 @@
 # https://stackoverflow.com/questions/898669/how-can-i-detect-if-a-file-is-binary-non-text-in-python
 import os
 import sys
-
-# import json
+from constants import APP_DATA_DIR, SYNKO_STORAGE_DIR
 import yaml
-from yaml.loader import Loader
 
 
 def validate_config_paths(configPaths):
@@ -20,11 +18,11 @@ def validate_config_paths(configPaths):
     get_real_paths(configPaths)
 
     # remove paths which do not exist
-    removed_config_paths = remove_non_existing_paths(configPaths)
+    removed_paths = remove_non_existing_paths(configPaths)
 
     # showing warning for removed paths
-    if len(removed_config_paths) > 0:
-        for path in removed_config_paths:
+    if len(removed_paths) > 0:
+        for path in removed_paths:
             print(f'"{path}" not found\n')  # yellow
 
     # get real path, of each path
@@ -35,14 +33,58 @@ def validate_config_paths(configPaths):
 
     # remove paths which are not in home directory
     # for now it only allows config files within home dir
-    removed_paths_outside_home = remove_files_outside_home_dir(configPaths)
+    removed_paths = remove_paths_outside_home_dir(configPaths)
 
     # showing warning for removed paths
-    if len(removed_paths_outside_home) > 0:
-        for path in removed_paths_outside_home:
-            print(f'"{path}" outside home directory, cannot be used\n')  # yellow
+    if len(removed_paths) > 0:
+        for path in removed_paths:
+            print(f"[!] '{path}' outside home directory, cannot be used\n")  # yellow
+
+    # remove paths which are inside dropbox/synko
+    removed_paths = remove_paths_in_storage_directory(configPaths)
+
+    # showing warning for removed paths
+    if len(removed_paths) > 0:
+        for path in removed_paths:
+            print(f"[!] '{path}' cannot be used as it is used by synko\n")  # yellow
+
+    # removed paths which are inside app data directory (.synko)
+    removed_paths = remove_paths_in_app_data_dir(configPaths)
+
+    # showing warning for removed paths
+    if len(removed_paths) > 0:
+        for path in removed_paths:
+            print(f"[!] '{path}' cannot be used as it is used by synko\n")  # yellow
 
     # boom! all done ig?
+
+
+def remove_paths_in_storage_directory(configPaths):
+    """
+    removes paths which are inside dropbox/synko
+    """
+    removed_paths = list()
+
+    for p in configPaths:
+        if SYNKO_STORAGE_DIR in p:
+            removed_paths.append(p)
+            configPaths.remove(p)
+
+    return removed_paths
+
+
+def remove_paths_in_app_data_dir(configPaths):
+    """
+    removes paths which are inside dropbox/synko
+    """
+    removed_paths = list()
+
+    for p in configPaths:
+        if APP_DATA_DIR in p:
+            removed_paths.append(p)
+            configPaths.remove(p)
+
+    return removed_paths
 
 
 def remove_non_existing_paths(configPaths):
@@ -69,7 +111,7 @@ def get_real_paths(configPaths):
         configPaths[i] = os.path.realpath(p)
 
 
-def remove_files_outside_home_dir(configPaths):
+def remove_paths_outside_home_dir(configPaths):
     removed_path = list()
     homedir = os.path.expanduser("~")
     for p in configPaths:
@@ -153,6 +195,31 @@ def shorten_path(file_path):
         expanded_path (str)
     """
     return file_path.replace(os.path.expanduser("~"), "~")
+
+
+def generate_link_path(src_path):
+    """about function"""
+    base_name = os.path.basename(src_path)
+    return os.path.join(SYNKO_STORAGE_DIR, base_name)
+
+
+def link_all(paths):
+    """about function"""
+    for p in paths:
+        link_to = generate_link_path()
+        link(paths, link_to)
+        # TODO: chmod
+
+
+def link(src, link_to):
+    """
+    1. check if link_to exists
+        not? create one and link
+        yes? delete link_to
+    2. perform symlink
+
+    """
+    pass
 
 
 # TODO: red color

@@ -27,8 +27,8 @@ def main():
 def add(name, paths):
     """
     0. validate paths
-    1. update/add paths in track data
-    2. perform symlink and stuff
+    1. perform symlink and stuff
+    2. update/add paths in track data
     """
 
     paths = list(set(paths))
@@ -38,19 +38,22 @@ def add(name, paths):
     if len(paths) == 0:
         utils.error("No paths specified!")
 
+    # perform various checks and validate
     utils.validate_config_paths(paths)
 
-    # check if already exists in track file?
+    # check if paths already exists in track file?
+    App.check_duplicate_paths(paths)
 
-    # write to file
+    # perform symlink
+
+    # update track data and file
     track_data.setdefault(name, dict())
     track_data[name].setdefault(device_id, list())
 
     track_data[name][device_id].extend(paths)
-
     App.update_track_data(track_data)
 
-    click.echo("added successfully for sync!")
+    click.echo(f"added successfully to synko!")
 
 
 # index command
