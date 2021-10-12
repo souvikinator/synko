@@ -7,14 +7,19 @@ import yaml
 from yaml.loader import Loader
 
 
-def validate_config_path(configPaths):
+def validate_config_paths(configPaths):
     """
-    0. get real path of all the paths
-    1. check if all paths exists
-    2. check if they are any duplicates in configPaths after getting real path
+    working:
+        - remove path which do not exist
+        - get real path and remove duplicates
+        - remove paths which are outside home dir
+
+    args:
+        configPaths (list)
     """
     get_real_paths(configPaths)
 
+    # remove paths which do not exist
     removed_config_paths = remove_non_existing_paths(configPaths)
 
     # showing warning for removed paths
@@ -22,21 +27,28 @@ def validate_config_path(configPaths):
         for path in removed_config_paths:
             print(f'"{path}" not found\n')  # yellow
 
+    # get real path, of each path
+    get_real_paths(configPaths)
+
     # remove duplicates after getting real paths
-    configPaths = set(configPaths)
+    configPaths = list(set(configPaths))
 
     # remove paths which are not in home directory
+    # for now it only allows config files within home dir
     removed_paths_outside_home = remove_files_outside_home_dir(configPaths)
 
     # showing warning for removed paths
-    if len(removed_config_paths) > 0:
-        for path in removed_config_paths:
-            print(f'"{path}" outside home directory\n')  # yellow
+    if len(removed_paths_outside_home) > 0:
+        for path in removed_paths_outside_home:
+            print(f'"{path}" outside home directory, cannot be used\n')  # yellow
+
+    # boom! all done ig?
 
 
 def remove_non_existing_paths(configPaths):
     """
-    removes paths which do not exist
+    - removes paths which do not exist
+
     args:
         configPaths (list)
     return:
@@ -54,7 +66,7 @@ def remove_non_existing_paths(configPaths):
 
 def get_real_paths(configPaths):
     for i, p in enumerate(configPaths):
-        configPaths[i] = os.path.realpath(configPaths[i])
+        configPaths[i] = os.path.realpath(p)
 
 
 def remove_files_outside_home_dir(configPaths):
@@ -65,6 +77,8 @@ def remove_files_outside_home_dir(configPaths):
             removed_path.append(p)
             configPaths.remove(p)
 
+    return removed_path
+
 
 def write_yml_file(data, filepath):
     try:
@@ -74,7 +88,7 @@ def write_yml_file(data, filepath):
         print(e)
 
 
-def read_yml_file(filepath, default_data={}):
+def read_yml_file(filepath, default_data=dict()):
     with open(filepath, "a+") as f:
         try:
 
@@ -91,6 +105,54 @@ def read_yml_file(filepath, default_data={}):
             print(exc)
 
     return data
+
+
+def expand_all_paths(file_paths):
+    """
+    expands ~ to home directory in list of paths
+
+    Args:
+        file_paths (list) : list of paths to expand
+    """
+    for i, fp in enumerate(file_paths):
+        file_paths[i] = expand_path(fp)
+
+
+def shorten_all_paths(file_paths):
+    """
+    expands home directory to ~ in list of paths
+
+    Args:
+        file_paths (list) : list of paths to shorten
+    """
+    for i, fp in enumerate(file_paths):
+        file_paths[i] = shorten_path(fp)
+
+
+def expand_path(file_path):
+    """
+    expand ~ -> home directory in any path
+
+    Args:
+        file_path (str)
+
+    Return:
+        expanded_path (str)
+    """
+    return file_path.replace("~", os.path.expanduser("~"))
+
+
+def shorten_path(file_path):
+    """
+    expand home directory to ~ in any path
+
+    Args:
+        file_path (str)
+
+    Return:
+        expanded_path (str)
+    """
+    return file_path.replace(os.path.expanduser("~"), "~")
 
 
 # TODO: red color
