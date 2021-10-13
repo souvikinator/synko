@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import sys
+import os
 import click
 from click.termui import prompt
 from Synko import Synko
@@ -37,19 +38,46 @@ def add(name, paths):
     utils.validate_config_paths(paths)
 
     # check if paths already exists in track file?
-    App.check_duplicate_paths(paths)
-
-    # form links
-    utils.link_all(paths)
+    App.check_duplicate_paths(name, paths)
 
     # update track data and file
     track_data.setdefault(name, dict())
     track_data[name].setdefault(device_id, list())
 
-    track_data[name][device_id].extend(paths)
+    # form links and update track data
+    for p in paths:
+        selected = 0
+        link_to = utils.generate_link_path(p)
+
+        # if link_to exists then ask for confirmation
+        if os.path.exists(link_to):
+            print(
+                f"CONFLICT!\nLooks like backup file of '{p}' already exists on this device and may have different content than the one on another device!\n"
+            )
+            print(f"[0] This will sync data of '{p}' on device to another device\n")
+            print(
+                f"[1] This will sync data from another device to '{p}' on this device\n"
+            )
+            print(
+                f"For more information select abort and visit https://github.com/souvikinator/synko .\n"
+            )
+            selected = utils.select_option("Select option", [0, 1, "skip", "abort"])
+
+        if selected == "abort":
+            print("[✕] Aborted!")
+            break
+        elif selected == "skip":
+            print(f"[ ] {p}")
+            continue
+        else:
+            utils.link(p, link_to, selected)
+            track_data[name][device_id].append(p)
+            print(f"[✓] {p}")
+
+    # write track data to track file
     App.update_track_data(track_data)
 
-    click.echo(f"added successfully to synko!")
+    click.echo(f"Done!")
 
 
 # index command
@@ -91,13 +119,19 @@ def remove(name, a):
         utils.error(f"nothing to remove in config name '{name}'")
 
     # ask for user input: select config file to delete
-    to_be_removed_paths = utils.select_options(config_paths)
+    to_be_removed_paths = utils.select_options(
+        "Select paths to remove (↑↓ for naivgation and → ← for select and unselect respectively)",
+        config_paths,
+    )
 
     if len(to_be_removed_paths) == 0:
         utils.error(f"No options selected!\nAborting remove")
 
     # unlink src from link_to
-    utils.unlink_all(to_be_removed_paths)
+    for p in to_be_removed_paths:
+        link_to = utils.generate_link_path(p)
+        utils.unlink(p, link_to)
+        print(f"[✓] {p}")
 
     # update track data
     track_data[name][device_id] = [
@@ -119,7 +153,7 @@ def remove(name, a):
 
     App.update_track_data(track_data)
 
-    print(f"removed successfully!")
+    print(f"Done!")
 
 
 if __name__ == "__main__":

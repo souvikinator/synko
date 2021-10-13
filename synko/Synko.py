@@ -24,7 +24,6 @@ class Synko:
         self.__metadata["SYNKO_DEVICE_ID"] = ""
 
         # app data
-        # TODO: last accessed
         self.__appdata = dict()
         self.__appdata["PLATFORM"] = platform.system()
         self.__appdata["UID"] = str(uuid.uuid4())
@@ -93,11 +92,9 @@ class Synko:
                 for config_path in track_data[config][device_id]:
                     print(f"[*] {config_path}")
 
-    def check_duplicate_paths(self, file_paths):
+    def check_duplicate_paths(self, configname, file_paths):
         """
         - checks if provided path already exists in track_data
-        lists all the duplicate paths and exists
-        else it's happy happy :)
 
         Args:
             file_paths (list): list of file paths to configs
@@ -107,12 +104,12 @@ class Synko:
         track_data = self.get_track_data()
 
         for config in track_data:
-            existing_paths = track_data[config][device_id]
-            for ex_p in existing_paths:
-                if ex_p in file_paths:
+            existing_paths = track_data[config][device_id] or []
+            for p in existing_paths:
+                if p in file_paths:
                     found += 1
                     # red
-                    print(f"[x] '{ex_p}' is already added for sync under '{config}' !")
+                    print(f"[x] '{p}' is already added for sync under '{config}' !")
 
         if found > 0:
             sys.exit(0)
@@ -148,7 +145,6 @@ class Synko:
         device_id = self.device_id()
 
         if len(track_data) > 0:
-            print(track_data)
             for config in track_data:
                 utils.shorten_all_paths(track_data[config][device_id])
 

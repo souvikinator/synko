@@ -84,26 +84,6 @@ def remove_paths_in_storage_directory(configPaths):
     return tmp_paths, removed_paths
 
 
-# TODO: replace with python inquirer
-def select_options(options):
-    """enter options"""
-    option_count = len(options)
-    if option_count == 0:
-        return ()
-
-    questions = [
-        inquirer.Checkbox(
-            "remove",
-            message="Select paths to remove (↑↓ for naivgation and → ← for select and unselect respectively)",
-            choices=options,
-        ),
-    ]
-
-    selected_options = inquirer.prompt(questions)["remove"]
-
-    return selected_options
-
-
 def remove_paths_in_app_data_dir(configPaths):
     """
     - removes paths which are inside ~/.synko/
@@ -259,6 +239,50 @@ def generate_link_path(src_path):
     return os.path.join(SYNKO_STORAGE_DIR, base_name)
 
 
+# TODO: handle keyboard interupt
+def select_option(msg, options):
+    """select only one"""
+    option_count = len(options)
+    if option_count == 0:
+        return None
+
+    questions = [
+        inquirer.List(
+            "x",
+            message=msg,
+            choices=options,
+        ),
+    ]
+
+    selected_option = inquirer.prompt(questions)
+    if selected_option is not None:
+        return selected_option["x"]
+    else:
+        return None
+
+
+# TODO: handle keyboard interupt
+def select_options(msg, options):
+    """select many options"""
+    option_count = len(options)
+    if option_count == 0:
+        return ()
+
+    questions = [
+        inquirer.Checkbox(
+            "x",
+            message=msg,
+            choices=options,
+        ),
+    ]
+
+    selected_options = inquirer.prompt(questions)
+    if selected_options is not None:
+        return selected_options["x"]
+    else:
+        return []
+
+
 def link_all(paths):
     """
     - calls `link()` on each paths
@@ -275,9 +299,24 @@ def link_all(paths):
         link(p, link_to)
 
 
-def link(src, link_to):
+def delete_path(path):
+    if os.path.isdir(path):
+        shutil.rmtree(path)
+    elif os.path.isfile(path):
+        os.remove(path)
+
+
+def copy_path(src, dest):
+    if os.path.isdir(src):
+        shutil.copytree(src, dest)
+    elif os.path.isfile(src):
+        shutil.copy(src, dest)
+
+
+def link(src, link_to, mode=0):
     """
-    - check if link_to exists? yes? delete link_to
+    - if mode is 0 remove link_to then perform symlink
+    - if mode is 1 remove src then perform symlink
     - moves src to link_to
     - perform symlink
 
@@ -285,13 +324,13 @@ def link(src, link_to):
         `src (str)`: path to original file
         `link_to (str)`: path where src will be moved to
     """
-    if os.path.isdir(link_to):
-        shutil.rmtree(link_to)
-    elif os.path.isfile(link_to):
-        os.remove(link_to)
+    if mode == 1:
+        delete_path(src)
+    else:
+        delete_path(link_to)
+        # move src to link_to
+        shutil.move(src, link_to)
 
-    # move src to link_to
-    shutil.move(src, link_to)
     # symlink link_to <- src
     os.symlink(link_to, src)
 
@@ -322,13 +361,8 @@ def unlink(src, link_to):
     if os.path.exists(src) and os.path.realpath(src) == link_to:
         # delete src
         os.remove(src)
-
-        if os.path.isdir(link_to):
-            shutil.copytree(link_to, src)
-        elif os.path.isfile(link_to):
-            shutil.copy(link_to, src)
-
-    return
+        # copy link_to to src
+        copy_path(link_to, src)
 
 
 def delete_to_be_removed(paths):
@@ -343,16 +377,13 @@ def delete_to_be_removed(paths):
 def delete_backup(p):
     """about"""
     link_to = generate_link_path(p)
-    if os.path.isdir(link_to):
-        shutil.rmtree(link_to)
-    elif os.path.isfile(link_to):
-        os.remove(link_to)
+    delete_path(link_to)
 
 
 # TODO: red color
 def error(msg):
-    print(f"[x] {msg}")
-    sys.exit(1)
+    print(f"[✕] {msg}")
+    sys.exit(0)
 
 
 # TODO: yellow color
