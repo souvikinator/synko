@@ -72,8 +72,8 @@ def index(configs):
 # TODO: allow removing files
 @main.command()
 @click.argument("name", nargs=1)
-@click.option("--all", "-a", type=bool, default=True)
-def remove(name, all):
+@click.option("-a/-na", default=False)
+def remove(name, a):
     """remove specific config file from synko"""
 
     track_data = App.get_track_data()
@@ -96,9 +96,30 @@ def remove(name, all):
     if len(to_be_removed_paths) == 0:
         utils.error(f"No options selected!\nAborting remove")
 
-    # TODO:
-    App.unlink_all(to_be_removed_paths)
+    # unlink src from link_to
+    utils.unlink_all(to_be_removed_paths)
+
     # update track data
+    track_data[name][device_id] = [
+        i for i in config_paths if i not in to_be_removed_paths
+    ]
+
+    # check if to_be_removed_paths are associated with any other device id, if not then delete them
+    for device in track_data[name]:
+        for p in to_be_removed_paths:
+            if p not in track_data[name][device]:
+                utils.delete_backup(p)
+
+    # remove/delete file
+    if len(track_data[name][device_id]) == 0:
+        track_data[name].pop(device_id, None)
+
+    if len(track_data[name]) == 0:
+        track_data.pop(name, None)
+
+    App.update_track_data(track_data)
+
+    print(f"removed successfully!")
 
 
 if __name__ == "__main__":
