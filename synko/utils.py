@@ -3,6 +3,7 @@ import os
 import sys
 import yaml
 import shutil
+import inquirer
 from constants import APP_DATA_DIR, SYNKO_STORAGE_DIR
 
 
@@ -90,24 +91,16 @@ def select_options(options):
     if option_count == 0:
         return ()
 
-    print(f"[?] Select options (enter options numbers space separated):")
-    for i, op in enumerate(options):
-        print(f" {i+1}. {op}")
+    questions = [
+        inquirer.Checkbox(
+            "remove",
+            message="Select paths to remove (↑↓ for naivgation and → ← for select and unselect respectively)",
+            choices=options,
+        ),
+    ]
 
-    # take input
-    try:
-        selected_option_num = [int(x) for x in input().split()]
+    selected_options = inquirer.prompt(questions)["remove"]
 
-        # check for valid input (no negative and withing option_count range)
-        if not all([(n <= option_count and n > 0) for n in selected_option_num]):
-            error(f"Invalid input!\nNumbers must be 1-{option_count}")
-
-    except ValueError as ve:
-        error(f"Invaid input!\nEnter option numbers space separated")
-    except Exception as e:
-        error(e)
-
-    selected_options = [options[n] for n in selected_option_num]
     return selected_options
 
 
@@ -301,6 +294,59 @@ def link(src, link_to):
     shutil.move(src, link_to)
     # symlink link_to <- src
     os.symlink(link_to, src)
+
+
+def unlink_all(paths):
+    """
+    - calls `unlink()` on each paths
+
+    Args:
+        `paths (list)`: list of config paths
+    """
+    for p in paths:
+        link_to = generate_link_path(p)
+        unlink(p, link_to)
+
+
+def unlink(src, link_to):
+    """
+    - check if src exists?
+    - resolve(src) == link_to?
+        - yes: delete src, copy link_to to src
+    - else return
+
+    Args:
+        `src (str)`: path to original file
+        `link_to (str)`: path where src will be moved to
+    """
+    if os.path.exists(src) and os.path.realpath(src) == link_to:
+        # delete src
+        os.remove(src)
+
+        if os.path.isdir(link_to):
+            shutil.copytree(link_to, src)
+        elif os.path.isfile(link_to):
+            shutil.copy(link_to, src)
+
+    return
+
+
+def delete_to_be_removed(paths):
+    """about"""
+    if len(paths) == 0:
+        return
+
+    for p in paths:
+        delete_backup(p)
+
+
+def delete_backup(p):
+    """about"""
+    link_to = generate_link_path(p)
+    if os.path.isdir(link_to):
+        shutil.rmtree(link_to)
+    elif os.path.isfile(link_to):
+        os.remove(link_to)
 
 
 # TODO: red color
