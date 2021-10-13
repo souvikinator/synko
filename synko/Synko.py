@@ -67,11 +67,17 @@ class Synko:
 
         # all good to go
 
+    def display_synko_info(self):
+        """displays synko data/info"""
+        for key in self.__appdata:
+            print(f"[>] {key} : {self.__appdata[key]}")
+
     # TODO: update storage dir
     def update_storage(self, name=None, dir=None):
-        name = name or self.__appdata["STORAGE_DIR"]
-        dir = dir or self.__appdata["STORAGE_NAME"]
-        utils.write_yml_file(self.__appdata, self.__metadata["APP_DATA_FILE"])
+        if name is not None or dir is not None:
+            name = name or self.__appdata["STORAGE_DIR"]
+            dir = dir or self.__appdata["STORAGE_NAME"]
+            utils.write_yml_file(self.__appdata, self.__metadata["APP_DATA_FILE"])
 
     # TODO: get app data
     def get_appdata(self):

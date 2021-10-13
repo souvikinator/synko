@@ -82,8 +82,6 @@ def add(name, paths):
 
 # index command
 @main.command()
-@click.option("--configs", "-c", type=bool, default=True)
-# @click.option("--devices", "-d", type=bool, default=False)
 def index(configs):
     """list all the donfig files added to synko"""
     track_data = App.get_track_data()
@@ -97,7 +95,6 @@ def index(configs):
 
 
 # remove command
-# TODO: allow removing files
 @main.command()
 @click.argument("name", nargs=1)
 @click.option("-a/-na", default=False)
@@ -154,6 +151,18 @@ def remove(name, a):
     App.update_track_data(track_data)
 
     print(f"Done!")
+
+
+# info command
+@main.command()
+@click.option("-s", "--storage", type=str, default="")
+@click.option("-p", "--storage-path", type=str, default="")
+def info(storage, storage_path):
+    """displays current settings for synko"""
+    if len(storage) == 0 or len(storage_path) == 0:
+        App.display_synko_info()
+
+    # TODO: add storage and storage path update
 
 
 if __name__ == "__main__":
