@@ -25,7 +25,7 @@ def validate_config_paths(configPaths):
     # showing warning for removed paths
     if len(removed_paths) > 0:
         for path in removed_paths:
-            print(f'[!] "{path}" not found')  # yellow
+            warn(f"'{path}' not found")
         sys.exit(0)
 
     # get real path, of each path
@@ -41,16 +41,16 @@ def validate_config_paths(configPaths):
     # showing warning for removed paths
     if len(removed_paths) > 0:
         for path in removed_paths:
-            print(f"[!] '{path}' outside home directory, cannot be used\n")  # yellow
+            warn(f"'{path}' outside home directory, cannot be used")
         sys.exit(0)
 
     # remove paths which are inside dropbox/synko
-    configPaths, removed_paths = remove_paths_in_storage_directory(configPaths)
+    configPaths, removed_paths = remove_paths_in_storage_dir(configPaths)
 
     # showing warning for removed paths
     if len(removed_paths) > 0:
         for path in removed_paths:
-            print(f"[!] '{path}' cannot be used as it is used by synko\n")  # yellow
+            warn(f"'{path}' cannot be used as it is used by synko")
         sys.exit(0)
 
     # removed paths which are inside app data directory (.synko)
@@ -59,12 +59,13 @@ def validate_config_paths(configPaths):
     # showing warning for removed paths
     if len(removed_paths) > 0:
         for path in removed_paths:
-            print(f"[!] '{path}' cannot be used as it is used by synko\n")  # yellow
+            warn(f"'{path}' cannot be used as it is used by synko")  # yellow
+        sys.exit(0)
 
     # boom! all done ig?
 
 
-def remove_paths_in_storage_directory(configPaths):
+def remove_paths_in_storage_dir(configPaths):
     """
     - removes paths from provided lists which are inside dropbox/synko
 
@@ -76,7 +77,7 @@ def remove_paths_in_storage_directory(configPaths):
     tmp_paths = list()
 
     for p in configPaths:
-        if SYNKO_STORAGE_DIR in p:
+        if is_path_in_storage_dir(p):
             removed_paths.append(p)
         else:
             tmp_paths.append(p)
@@ -86,7 +87,7 @@ def remove_paths_in_storage_directory(configPaths):
 
 def remove_paths_in_app_data_dir(configPaths):
     """
-    - removes paths which are inside ~/.synko/
+    - removes paths (among configPaths) which are inside ~/.synko/
 
     Returns:
         `removed_paths (list)`: list of paths from configPaths which were removed
@@ -96,12 +97,20 @@ def remove_paths_in_app_data_dir(configPaths):
     tmp_paths = list()
 
     for p in configPaths:
-        if APP_DATA_DIR in p:
+        if is_path_in_app_data_dir(p):
             removed_paths.append(p)
         else:
             tmp_paths.append(p)
 
     return tmp_paths, removed_paths
+
+
+def is_path_in_storage_dir(configPath):
+    return SYNKO_STORAGE_DIR in configPath
+
+
+def is_path_in_app_data_dir(configPath):
+    return APP_DATA_DIR in configPath
 
 
 def remove_non_existing_paths(configPaths):
@@ -159,7 +168,7 @@ def write_yml_file(data, filepath):
         with open(filepath, "w") as f:
             yaml.dump(data, f)
     except Exception as e:
-        print(e)
+        error(e)
 
 
 def read_yml_file(filepath, default_data=dict()):
@@ -179,8 +188,8 @@ def read_yml_file(filepath, default_data=dict()):
                 f.seek(0)
                 data = yaml.safe_load(f)
 
-        except yaml.YAMLError as exc:
-            print(exc)
+        except Exception as exc:
+            error(exc)
 
     return data
 
@@ -335,18 +344,6 @@ def link(src, link_to, mode=0):
     os.symlink(link_to, src)
 
 
-def unlink_all(paths):
-    """
-    - calls `unlink()` on each paths
-
-    Args:
-        `paths (list)`: list of config paths
-    """
-    for p in paths:
-        link_to = generate_link_path(p)
-        unlink(p, link_to)
-
-
 def unlink(src, link_to):
     """
     - check if src exists?
@@ -365,36 +362,47 @@ def unlink(src, link_to):
         copy_path(link_to, src)
 
 
-def delete_to_be_removed(paths):
-    """about"""
-    if len(paths) == 0:
-        return
-
-    for p in paths:
-        delete_backup(p)
-
-
 def delete_backup(p):
-    """about"""
+    """delete backup file"""
     link_to = generate_link_path(p)
     delete_path(link_to)
 
 
-# TODO: red
+# TODO: red and bold
 def error(msg):
     sys.exit(f"[✕] {msg}")
 
 
-# TODO: yellow
+# TODO: yellow and bold
 def warn(msg):
     print(f"[!] {msg}")
 
 
-# TODO: green
+# TODO: green and bold
 def success(msg):
     print(f"[✓] {msg}")
 
 
-# TODO: cyan
+# TODO: cyan and bold
 def info(msg):
     print(f"[i] {msg}")
+
+
+# def unlink_all(paths):
+#     """
+#     - calls `unlink()` on each paths
+
+#     Args:
+#         `paths (list)`: list of config paths
+#     """
+#     for p in paths:
+#         link_to = generate_link_path(p)
+#         unlink(p, link_to)
+
+# def delete_backups(paths):
+#     """calls `delete_backup()` on each path"""
+#     if len(paths) == 0:
+#         return
+
+#     for p in paths:
+#         delete_backup(p)

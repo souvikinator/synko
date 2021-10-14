@@ -88,22 +88,25 @@ def add(name, paths):
 # TODO: allow users to enter config name and display
 # configs only of that specific configuration
 @main.command()
-def index(configs):
+@click.argument("name", nargs=1, required=False)
+def index(name):
     """list all the donfig files added to synko"""
     track_data = App.get_track_data()
 
     if len(track_data) == 0:
         utils.error("nothing to list")
 
-    if configs:
+    if name:
         App.display_track_data()
 
 
 # remove command
 @main.command()
 @click.argument("name", nargs=1)
-# TODO: @click.option("-a/-na", default=False)
-def remove(name, a):
+# TODO: @click.option(
+#     "--all", "-a", is_flag=True, help="remove all config files under config name"
+# )
+def remove(name, all):
     """remove specific config file from synko"""
 
     track_data = App.get_track_data()
@@ -119,6 +122,9 @@ def remove(name, a):
 
     if len(config_paths) == 0:
         utils.error(f"nothing to remove in '{name}'")
+
+    # TODO: show select option only when "all" arg is not used
+    # when "all" option is used, set to_be_removed_paths=config_paths
 
     # ask for user input: select config file to delete
     to_be_removed_paths = utils.select_options(
@@ -160,20 +166,18 @@ def remove(name, a):
 
 
 # info command
-# TODO: allow users to update storage and storage path
-# using -s and -p flag
 @main.command()
-@click.option("-s", "--storage", type=str, default="")
-@click.option("-p", "--storage-path", type=str, default="")
-def info(storage, storage_path):
+# @click.option("-p", "--storage-path", type=str, default="", prompt=True)
+def info(storage_path):
     """displays current settings for synko"""
-    if len(storage) == 0 or len(storage_path) == 0:
+    if len(storage_path) == 0:
         App.display_synko_info()
 
-    # TODO: add storage and storage path update
+    # TODO: add storage and storage path update feature
+    # App.update_storage(storage_path) for this feature
 
 
 if __name__ == "__main__":
     # TODO: get OS using platform.system()
-    # and exit if OS is windows
+    # and exit if OS is not Linux/Darwin
     main()

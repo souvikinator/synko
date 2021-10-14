@@ -27,7 +27,6 @@ class Synko:
         self.__appdata = dict()
         self.__appdata["PLATFORM"] = platform.system()
         self.__appdata["UID"] = str(uuid.uuid4())
-        self.__appdata["STORAGE_NAME"] = "dropbox"
         self.__appdata["STORAGE_DIR"] = STORAGE_DIR  # dropboxstorage directory ig?
 
         # track data
@@ -52,10 +51,11 @@ class Synko:
         ] = f'{self.__appdata["PLATFORM"]}~{self.__appdata["UID"]}'
 
         # if storage path exists (dropbox path)
-        # TODO: need to elaborate error msg
         if not os.path.exists(self.__appdata["STORAGE_DIR"]):
             utils.error(
-                f'storage directory "{self.__appdata["STORAGE_DIR"]}" for "{self.__metadata["STORAGE_NAME"]}"'
+                f"""storage directory '{self.__appdata['STORAGE_DIR']}' not found!
+                Make sure you have dropbox installed!
+                """
             )
 
         # synko storage dir exists? no: create one
@@ -66,68 +66,6 @@ class Synko:
         self.__trackdata = self.__load_tracking_file()
 
         # all good to go
-
-    def display_synko_info(self):
-        """displays synko data/info"""
-        for key in self.__appdata:
-            print(f"[>] {key} : {self.__appdata[key]}")
-
-    # TODO: update storage dir
-    def update_storage(self, name=None, dir=None):
-        if name is not None or dir is not None:
-            name = name or self.__appdata["STORAGE_DIR"]
-            dir = dir or self.__appdata["STORAGE_NAME"]
-            utils.write_yml_file(self.__appdata, self.__metadata["APP_DATA_FILE"])
-
-    # TODO: get app data
-    def get_appdata(self):
-        return self.__appdata
-
-    # TODO: update track data
-    def get_track_data(self):
-        return self.__trackdata
-
-    def display_track_data(self):
-        device_id = self.device_id()
-        track_data = self.get_track_data()
-
-        for config in track_data:
-            if track_data[config][device_id] is not None:
-                print(f"[>] {config}")
-
-                for config_path in track_data[config][device_id]:
-                    print(f"[*] {config_path}")
-
-    def check_duplicate_paths(self, configname, file_paths):
-        """
-        - checks if provided path already exists in track_data
-
-        Args:
-            file_paths (list): list of file paths to configs
-        """
-        found = 0
-        device_id = self.device_id()
-        track_data = self.get_track_data()
-
-        for config in track_data:
-            existing_paths = track_data[config][device_id] or []
-            for p in existing_paths:
-                if p in file_paths:
-                    found += 1
-                    # red
-                    print(f"[x] '{p}' is already added for sync under '{config}' !")
-
-        if found > 0:
-            sys.exit(0)
-
-    def get_metadata(self):
-        return self.__metadata
-
-    # TODO: update track data
-    def update_track_data(self, trackdata):
-        self.__trackdata = trackdata
-        # write to file
-        self.__update_track_file()
 
     def __load_tracking_file(self):
         """
@@ -156,6 +94,66 @@ class Synko:
 
         # write to file
         utils.write_yml_file(track_data, self.__metadata["SYNKO_TRACK_FILE"])
+
+    def display_synko_info(self):
+        """displays synko data/info"""
+        for key in self.__appdata:
+            utils.info(f"{key} : {self.__appdata[key]}")
+
+    # update storage dir
+    def update_storage(self, dir=None):
+        if dir is not None:
+            self.__appdata["STORAGE_DIR"] = dir or self.__appdata["STORAGE_DIR"]
+            utils.write_yml_file(self.__appdata, self.__metadata["APP_DATA_FILE"])
+
+    # get app data
+    def get_appdata(self):
+        return self.__appdata
+
+    # update track data
+    def get_track_data(self):
+        return self.__trackdata
+
+    def display_track_data(self):
+        device_id = self.device_id()
+        track_data = self.get_track_data()
+
+        for config in track_data:
+            if track_data[config][device_id] is not None:
+                print(f"[*] {config}")
+
+                for config_path in track_data[config][device_id]:
+                    print(f" [-] {config_path}")
+
+    def check_duplicate_paths(self, file_paths):
+        """
+        - checks if provided path already exists in track_data
+
+        Args:
+            file_paths (list): list of file paths to configs
+        """
+        found = 0
+        device_id = self.device_id()
+        track_data = self.get_track_data()
+
+        for config in track_data:
+            existing_paths = track_data[config][device_id] or []
+            for p in existing_paths:
+                if p in file_paths:
+                    found += 1
+                    utils.warn(f"'{p}' is already added for sync under '{config}'")
+
+        if found > 0:
+            utils.error("aborting!")
+
+    def get_metadata(self):
+        return self.__metadata
+
+    # update track data
+    def update_track_data(self, trackdata):
+        self.__trackdata = trackdata
+        # write to file
+        self.__update_track_file()
 
     def device_id(self):
         return self.__metadata["SYNKO_DEVICE_ID"]
