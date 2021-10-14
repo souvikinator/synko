@@ -27,7 +27,7 @@ class Synko:
         self.__appdata = dict()
         self.__appdata["PLATFORM"] = platform.system()
         self.__appdata["UID"] = str(uuid.uuid4())
-        self.__appdata["STORAGE_NAME"] = "Dropbox"
+        self.__appdata["STORAGE_NAME"] = "dropbox"
         self.__appdata["STORAGE_DIR"] = STORAGE_DIR  # dropboxstorage directory ig?
 
         # track data

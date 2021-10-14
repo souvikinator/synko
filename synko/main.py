@@ -5,15 +5,30 @@ import click
 from click.termui import prompt
 from Synko import Synko
 import utils
-from constants import APP_NAME, APP_VERISON
+from constants import (
+    APP_NAME,
+    APP_VERISON,
+    SYNKO_CONFLICT,
+    USAGE_DETAILS,
+    SYNKO_BANNER,
+    SYNKO_ABOUT,
+)
 
 
 App = Synko()
 
 
-@click.group()
+class HelpfulCmd(click.Group):
+    def format_help(self, ctx, formatter):
+        print(SYNKO_BANNER)
+        print(SYNKO_ABOUT)
+        print(USAGE_DETAILS)
+
+
+@click.group(cls=HelpfulCmd)
 @click.version_option(version=APP_VERISON, prog_name=APP_NAME)
 def main():
+    print(SYNKO_BANNER)
     # initialize app here
     App.init_app()
 
@@ -51,23 +66,14 @@ def add(name, paths):
 
         # if link_to exists then ask for confirmation
         if os.path.exists(link_to):
-            print(
-                f"CONFLICT!\nLooks like backup file of '{p}' already exists on this device and may have different content than the one on another device!\n"
-            )
-            print(f"[0] This will sync data of '{p}' on device to another device\n")
-            print(
-                f"[1] This will sync data from another device to '{p}' on this device\n"
-            )
-            print(
-                f"For more information select abort and visit https://github.com/souvikinator/synko .\n"
-            )
+            print(SYNKO_CONFLICT.format(path=p))
             selected = utils.select_option("Select option", [0, 1, "skip", "abort"])
 
         if selected == "abort":
-            print("[✕] Aborted!")
+            print("[.] Aborted!")
             break
         elif selected == "skip":
-            print(f"[ ] {p}")
+            print(f"[*] {p}")
             continue
         else:
             utils.link(p, link_to, selected)
@@ -81,6 +87,8 @@ def add(name, paths):
 
 
 # index command
+# TODO: allow users to enter config name and display
+# configs only of that specific configuration
 @main.command()
 def index(configs):
     """list all the donfig files added to synko"""
@@ -97,7 +105,7 @@ def index(configs):
 # remove command
 @main.command()
 @click.argument("name", nargs=1)
-@click.option("-a/-na", default=False)
+# @click.option("-a/-na", default=False)
 def remove(name, a):
     """remove specific config file from synko"""
 
@@ -154,6 +162,8 @@ def remove(name, a):
 
 
 # info command
+# TODO: allow users to update storage and storage path
+# using -s and -p flag
 @main.command()
 @click.option("-s", "--storage", type=str, default="")
 @click.option("-p", "--storage-path", type=str, default="")
@@ -166,12 +176,4 @@ def info(storage, storage_path):
 
 
 if __name__ == "__main__":
-    click.echo(
-        f"""        
- __  .._ ;_/ _ 
-_) \_|[ )| \(_)
-   ._|          v{APP_VERISON}
-
-        """
-    )
     main()
