@@ -15,14 +15,15 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/souvikinator/synko",
     keyword="cli, sync, config, settings, application, configuration, linux, osx",
-    # py_modules=["my_tool", "app"],
     packages=find_packages(),
     install_requires=[requirements],
     python_requires=">=3",
     classifiers=[
         "License :: OSI Approved :: GPL-3.0 License",
         "Programming Language :: Python :: 3",
-        "Operating System :: OS Independent",
+        "Operating System :: Linux",
+        "Operating System :: Darwin",
+        "Operating System :: OSX",
     ],
     entry_points="""
         [console_scripts]
