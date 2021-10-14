@@ -5,25 +5,27 @@ with open("README.md", "r", encoding="utf-8") as fh:
 with open("requirements.txt", "r", encoding="utf-8") as fh:
     requirements = fh.read()
 setup(
-    name="mytool",
+    name="synko",
     version="0.0.1",
-    author="John Doe",
-    author_email="john.doe@foo.com",
-    license="<the license you chose>",
-    description="<short description for the tool>",
+    author="souvikinator",
+    author_email="souvikat001@gmail.com",
+    license="GPL-3.0",
+    description="Sync application configurations and settings across multiple multiplatform devices. Currently supports linux and osx, working in progress for windows",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="<github url where the tool code will remain>",
-    py_modules=["my_tool", "app"],
+    url="https://github.com/souvikinator/synko",
+    keyword="cli, sync, config, settings, application, configuration, linux, osx",
+    # py_modules=["my_tool", "app"],
     packages=find_packages(),
     install_requires=[requirements],
-    python_requires=">=3.7",
+    python_requires=">=3",
     classifiers=[
-        "Programming Language :: Python :: 3.8",
+        "License :: OSI Approved :: GPL-3.0 License",
+        "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
     entry_points="""
         [console_scripts]
-        cooltool=my_tool:main
+        synko=synko.main:main
     """,
 )
