@@ -380,12 +380,21 @@ def delete_backup(p):
     delete_path(link_to)
 
 
-# TODO: red color
+# TODO: red
 def error(msg):
-    print(f"[✕] {msg}")
-    sys.exit(0)
+    sys.exit(f"[✕] {msg}")
 
 
-# TODO: yellow color
+# TODO: yellow
 def warn(msg):
     print(f"[!] {msg}")
+
+
+# TODO: green
+def success(msg):
+    print(f"[✓] {msg}")
+
+
+# TODO: cyan
+def info(msg):
+    print(f"[i] {msg}")

@@ -1,14 +1,12 @@
 #!/usr/bin/python3
-import sys
 import os
 import click
-from click.termui import prompt
-from Synko import Synko
 import utils
+from Synko import Synko
 from constants import (
     APP_NAME,
     APP_VERISON,
-    SYNKO_CONFLICT,
+    SYNKO_ADD_CONFLICT,
     USAGE_DETAILS,
     SYNKO_BANNER,
     SYNKO_ABOUT,
@@ -47,7 +45,7 @@ def add(name, paths):
     device_id = App.device_id()
 
     if len(paths) == 0:
-        utils.error("No paths specified!")
+        utils.error("no paths specified!")
 
     # perform various checks and validate
     utils.validate_config_paths(paths)
@@ -66,24 +64,24 @@ def add(name, paths):
 
         # if link_to exists then ask for confirmation
         if os.path.exists(link_to):
-            print(SYNKO_CONFLICT.format(path=p))
+            print(SYNKO_ADD_CONFLICT.format(path=p))
             selected = utils.select_option("Select option", [0, 1, "skip", "abort"])
 
         if selected == "abort":
-            print("[.] Aborted!")
+            utils.warn("aborted!")
             break
         elif selected == "skip":
-            print(f"[*] {p}")
+            utils.warn(f"skipped {p}")
             continue
         else:
             utils.link(p, link_to, selected)
             track_data[name][device_id].append(p)
-            print(f"[✓] {p}")
+            utils.success(f"added {p}")
 
     # write track data to track file
     App.update_track_data(track_data)
 
-    click.echo(f"Done!")
+    utils.success("done!")
 
 
 # index command
@@ -95,8 +93,7 @@ def index(configs):
     track_data = App.get_track_data()
 
     if len(track_data) == 0:
-        click.echo("Nothing to list")
-        sys.exit(0)
+        utils.error("nothing to list")
 
     if configs:
         App.display_track_data()
@@ -105,7 +102,7 @@ def index(configs):
 # remove command
 @main.command()
 @click.argument("name", nargs=1)
-# @click.option("-a/-na", default=False)
+# TODO: @click.option("-a/-na", default=False)
 def remove(name, a):
     """remove specific config file from synko"""
 
@@ -116,12 +113,12 @@ def remove(name, a):
         utils.error(f"config name '{name}' not found")
 
     if device_id not in track_data[name]:
-        utils.error(f"nothing to remove in config name '{name}'")
+        utils.error(f"nothing to remove in '{name}'")
 
     config_paths = track_data[name][device_id] or []
 
     if len(config_paths) == 0:
-        utils.error(f"nothing to remove in config name '{name}'")
+        utils.error(f"nothing to remove in '{name}'")
 
     # ask for user input: select config file to delete
     to_be_removed_paths = utils.select_options(
@@ -130,20 +127,21 @@ def remove(name, a):
     )
 
     if len(to_be_removed_paths) == 0:
-        utils.error(f"No options selected!\nAborting remove")
+        utils.warn("no options selected!")
+        utils.error("aborting")
 
     # unlink src from link_to
     for p in to_be_removed_paths:
         link_to = utils.generate_link_path(p)
         utils.unlink(p, link_to)
-        print(f"[✓] {p}")
+        utils.success(f"removed {p}")
 
     # update track data
     track_data[name][device_id] = [
         i for i in config_paths if i not in to_be_removed_paths
     ]
 
-    # check if to_be_removed_paths are associated with any other device id, if not then delete them
+    # check if to_be_removed_paths are associated with any other device id, if not then delete the backup file
     for device in track_data[name]:
         for p in to_be_removed_paths:
             if p not in track_data[name][device]:
@@ -158,7 +156,7 @@ def remove(name, a):
 
     App.update_track_data(track_data)
 
-    print(f"Done!")
+    utils.success("done!")
 
 
 # info command
@@ -176,4 +174,6 @@ def info(storage, storage_path):
 
 
 if __name__ == "__main__":
+    # TODO: get OS using platform.system()
+    # and exit if OS is windows
     main()
