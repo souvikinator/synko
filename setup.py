@@ -19,7 +19,7 @@ setup(
     install_requires=[requirements],
     python_requires=">=3",
     classifiers=[
-        "License :: OSI Approved :: GPL-3.0 License",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Programming Language :: Python :: 3",
         "Operating System :: POSIX :: Linux",
         "Operating System :: MacOS",
