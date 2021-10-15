@@ -26,6 +26,7 @@ class HelpfulCmd(click.Group):
 @click.group(cls=HelpfulCmd)
 @click.version_option(version=APP_VERISON, prog_name=APP_NAME)
 def main():
+    """CLI entry point"""
     print(SYNKO_BANNER)
     # initialize app here
     App.init_app()
@@ -53,8 +54,8 @@ def add(name, paths):
     App.check_duplicate_paths(name, paths)
 
     # update track data and file
-    track_data.setdefault(name, dict())
-    track_data[name].setdefault(device_id, list())
+    track_data.setdefault(name, {})
+    track_data[name].setdefault(device_id, [])
 
     # form links and update track data
     for p in paths:
@@ -69,7 +70,7 @@ def add(name, paths):
         if selected == "abort":
             utils.warn("aborted!")
             break
-        elif selected == "skip":
+        if selected == "skip":
             utils.warn(f"skipped {p}")
             continue
         else:
@@ -145,7 +146,8 @@ def remove(name, all):
         i for i in config_paths if i not in to_be_removed_paths
     ]
 
-    # check if to_be_removed_paths are associated with any other device id, if not then delete the backup file
+    # check if to_be_removed_paths are associated with any other
+    # device id, if not then delete the backup file
     for device in track_data[name]:
         for p in to_be_removed_paths:
             if p not in track_data[name][device]:

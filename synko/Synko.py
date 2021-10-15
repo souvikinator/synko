@@ -1,8 +1,8 @@
 import os
-import sys
 import uuid
-import utils
 import platform
+
+import utils
 
 from constants import (
     APP_DATA_DIR,
@@ -16,7 +16,7 @@ from constants import (
 class Synko:
     def __init__(self):
         # default metadata
-        self.__metadata = dict()
+        self.__metadata = {}
         self.__metadata["APP_DATA_DIR"] = APP_DATA_DIR
         self.__metadata["APP_DATA_FILE"] = APP_DATA_FILE
         self.__metadata["SYNKO_TRACK_FILE"] = SYNKO_TRACK_FILE
@@ -24,13 +24,13 @@ class Synko:
         self.__metadata["SYNKO_DEVICE_ID"] = ""
 
         # app data
-        self.__appdata = dict()
+        self.__appdata = {}
         self.__appdata["PLATFORM"] = platform.system()
         self.__appdata["UID"] = str(uuid.uuid4())
         self.__appdata["STORAGE_DIR"] = STORAGE_DIR  # dropboxstorage directory ig?
 
         # track data
-        self.__trackdata = dict()
+        self.__trackdata = {}
 
     # TODO: init app
     def init_app(self):
@@ -101,9 +101,9 @@ class Synko:
             utils.info(f"{key} : {self.__appdata[key]}")
 
     # update storage dir
-    def update_storage(self, dir=None):
+    def update_storage(self, dirpath=None):
         if dir is not None:
-            self.__appdata["STORAGE_DIR"] = dir or self.__appdata["STORAGE_DIR"]
+            self.__appdata["STORAGE_DIR"] = dirpath or self.__appdata["STORAGE_DIR"]
             utils.write_yml_file(self.__appdata, self.__metadata["APP_DATA_FILE"])
 
     # get app data

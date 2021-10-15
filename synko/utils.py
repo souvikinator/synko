@@ -1,8 +1,8 @@
 # https://stackoverflow.com/questions/898669/how-can-i-detect-if-a-file-is-binary-non-text-in-python
 import os
 import sys
-import yaml
 import shutil
+import yaml
 import inquirer
 from constants import APP_DATA_DIR, SYNKO_STORAGE_DIR
 
@@ -73,8 +73,8 @@ def remove_paths_in_storage_dir(configPaths):
         `removed_paths (list)`: list of paths from configPaths which were removed
         `tmp_paths (list)`: list of paths from configPaths which were not removed
     """
-    removed_paths = list()
-    tmp_paths = list()
+    removed_paths = []
+    tmp_paths = []
 
     for p in configPaths:
         if is_path_in_storage_dir(p):
@@ -93,8 +93,8 @@ def remove_paths_in_app_data_dir(configPaths):
         `removed_paths (list)`: list of paths from configPaths which were removed
         `tmp_paths (list)`: list of paths from configPaths which were not removed
     """
-    removed_paths = list()
-    tmp_paths = list()
+    removed_paths = []
+    tmp_paths = []
 
     for p in configPaths:
         if is_path_in_app_data_dir(p):
@@ -124,8 +124,8 @@ def remove_non_existing_paths(configPaths):
         `removed_paths (list)`: list of paths from configPaths which were removed
         `tmp_paths (list)`: list of paths from configPaths which were not removed
     """
-    non_existing_paths = list()
-    tmp_paths = list()
+    non_existing_paths = []
+    tmp_paths = []
     for p in configPaths:
         if not os.path.exists(p):
             non_existing_paths.append(p)
@@ -150,8 +150,8 @@ def remove_paths_outside_home_dir(configPaths):
         removed_paths (list): list of paths from configPaths which were removed
         tmp_paths (list): list of paths from configPaths which were not removed
     """
-    removed_path = list()
-    tmp_paths = list()
+    removed_path = []
+    tmp_paths = []
     homedir = os.path.expanduser("~")
 
     for p in configPaths:
@@ -171,7 +171,7 @@ def write_yml_file(data, filepath):
         error(e)
 
 
-def read_yml_file(filepath, default_data=dict()):
+def read_yml_file(filepath, default_data={}):
     """
     - creates yml file (if not exists) and writes default data
     - else reads and returns data
@@ -187,9 +187,14 @@ def read_yml_file(filepath, default_data=dict()):
             else:
                 f.seek(0)
                 data = yaml.safe_load(f)
-
-        except Exception as exc:
-            error(exc)
+        except FileNotFoundError:
+            error(f"File {file_size} not found.  Aborting")
+        except OSError:
+            error(f"OS error occurred trying to open {filepath}")
+        except yaml.YAMLError:
+            error(f"Error occurred while reading YAML file {filepath}")
+        except Exception as err:
+            error(f"Unexpected error opening {filepath} is, {err}")
 
     return data
 
@@ -266,8 +271,7 @@ def select_option(msg, options):
     selected_option = inquirer.prompt(questions)
     if selected_option is not None:
         return selected_option["x"]
-    else:
-        return None
+    return None
 
 
 # TODO: handle keyboard interupt
@@ -275,7 +279,7 @@ def select_options(msg, options):
     """select many options"""
     option_count = len(options)
     if option_count == 0:
-        return ()
+        return []
 
     questions = [
         inquirer.Checkbox(
@@ -288,8 +292,7 @@ def select_options(msg, options):
     selected_options = inquirer.prompt(questions)
     if selected_options is not None:
         return selected_options["x"]
-    else:
-        return []
+    return []
 
 
 def link_all(paths):
