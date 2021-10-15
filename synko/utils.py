@@ -386,23 +386,3 @@ def success(msg):
 # TODO: cyan and bold
 def info(msg):
     print(f"[i] {msg}")
-
-
-# def unlink_all(paths):
-#     """
-#     - calls `unlink()` on each paths
-
-#     Args:
-#         `paths (list)`: list of config paths
-#     """
-#     for p in paths:
-#         link_to = generate_link_path(p)
-#         unlink(p, link_to)
-
-# def delete_backups(paths):
-#     """calls `delete_backup()` on each path"""
-#     if len(paths) == 0:
-#         return
-
-#     for p in paths:
-#         delete_backup(p)

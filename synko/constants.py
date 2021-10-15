@@ -31,10 +31,10 @@ USAGE_DETAILS = """Usage: synko [options] [command] [args]
 
 Commands:
 
-add	add configuration to synko, first argument is name of config followed by path to config files
-remove  remove configuration from synko, takes config name as argument
-index	list all configurations added to synko
-info	list info related to synko (platform, device_id, storage name and storage path)
+ add	add configuration to synko, first argument is name of config followed by path to config files
+ remove  remove configuration from synko, takes config name as argument
+ index	list all configurations added to synko
+ info	list info related to synko (platform, device_id, storage name and storage path)
 
 To know mode about specific command: synko [command] --help
 

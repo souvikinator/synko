@@ -39,7 +39,6 @@ def add(name, paths):
     """
     add configuration path for syncing
     """
-
     paths = list(set(paths))
     track_data = App.get_track_data()
     device_id = App.device_id()
@@ -108,7 +107,6 @@ def index(name):
 # )
 def remove(name, all):
     """remove specific config file from synko"""
-
     track_data = App.get_track_data()
     device_id = App.device_id()
 
