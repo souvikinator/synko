@@ -21,9 +21,8 @@ setup(
     classifiers=[
         "License :: OSI Approved :: GPL-3.0 License",
         "Programming Language :: Python :: 3",
-        "Operating System :: Linux",
-        "Operating System :: Darwin",
-        "Operating System :: OSX",
+        "Operating System :: POSIX :: Linux",
+        "Operating System :: MacOS",
     ],
     entry_points="""
         [console_scripts]

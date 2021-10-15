@@ -4,7 +4,7 @@ import sys
 import shutil
 import yaml
 import inquirer
-from constants import APP_DATA_DIR, SYNKO_STORAGE_DIR
+from synko.constants import APP_DATA_DIR, SYNKO_STORAGE_DIR
 
 
 def validate_config_paths(configPaths):

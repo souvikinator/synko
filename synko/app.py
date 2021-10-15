@@ -20,14 +20,14 @@ class Synko:
         self.__metadata["APP_DATA_DIR"] = APP_DATA_DIR
         self.__metadata["APP_DATA_FILE"] = APP_DATA_FILE
         self.__metadata["SYNKO_TRACK_FILE"] = SYNKO_TRACK_FILE
-        self.__metadata["SYNKO_STORAGE_DIR"] = SYNKO_STORAGE_DIR  # storage/synkon
+        self.__metadata["SYNKO_STORAGE_DIR"] = SYNKO_STORAGE_DIR
         self.__metadata["SYNKO_DEVICE_ID"] = ""
 
         # app data
         self.__appdata = {}
         self.__appdata["PLATFORM"] = platform.system()
         self.__appdata["UID"] = str(uuid.uuid4())
-        self.__appdata["STORAGE_DIR"] = STORAGE_DIR  # dropboxstorage directory ig?
+        self.__appdata["STORAGE_DIR"] = STORAGE_DIR
 
         # track data
         self.__trackdata = {}

@@ -1,6 +1,6 @@
 # Synko
 
-Sync application configuration and settings across multiple multiplatform devices. Currently supports Linux and Darwin(OSX).
+Sync application configuration and settings across multiple multiplatform devices. Currently supports Linux and Darwin(macos).
 
 > **Work in progress for windows**
 
