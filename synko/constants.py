@@ -23,7 +23,7 @@ _) \_|[ )| \(_)
 """
 
 SYNKO_ABOUT = """Sync application configurations and settings across multiple devices
-currently supports linux and osx, working in progress for windows
+currently supports linux and macos, working in progress for windows
 more details: https://github.com/souvikinator/synko
 """
 
