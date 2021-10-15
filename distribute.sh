@@ -1,6 +1,4 @@
-TYPE="$1"
-
-is_user_root () { [ "$(id -u)" -eq 0 ]; }
+dist_type="$1"
 
 check_cmd_success () {
 	if [ $? -eq 0 ]; then
@@ -13,8 +11,11 @@ check_cmd_success () {
 
 echo "[WARNING] Make sure to run script as root else script may fail!\n"
 
-if [ ! -z "$TYPE" ]; then
-	TYPE="--test"
+echo "Deleting build/ dist/ synko.egg-info/"
+rm -r build dist synko.egg-info
+
+if [ ! -z "$dist_type" ]; then
+	TYPE="test"
 fi
 
 echo "[#] python3 setup.py install\n"
@@ -27,7 +28,7 @@ python3 setup.py sdist bdist_wheel
 
 check_cmd_success
 
-if "$TYPE" == "--live";then
+if [ "$dist_type" = "live" ]; then
 	echo "[#] uploading to live server\n"
 	twine upload dist/*
 else

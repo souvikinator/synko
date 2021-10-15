@@ -1,4 +1,3 @@
-twine
 click
 pyyaml
 inquirer

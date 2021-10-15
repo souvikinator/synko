@@ -1,7 +1,7 @@
 import os
 
 APP_NAME = "synko"
-APP_VERISON = "0.0.1"
+APP_VERISON = "0.0.3"
 
 # user specific consts
 USER_HOME_DIR = os.path.expanduser("~")
