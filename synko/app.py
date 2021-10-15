@@ -2,9 +2,9 @@ import os
 import uuid
 import platform
 
-import utils
+from synko import utils
 
-from constants import (
+from synko.constants import (
     APP_DATA_DIR,
     APP_DATA_FILE,
     STORAGE_DIR,

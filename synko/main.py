@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 import os
 import click
-import utils
-from Synko import Synko
-from constants import (
+from synko import utils
+from synko.app import Synko
+from synko.constants import (
     APP_NAME,
     APP_VERISON,
     SYNKO_ADD_CONFLICT,
@@ -51,7 +51,7 @@ def add(name, paths):
     utils.validate_config_paths(paths)
 
     # check if paths already exists in track file?
-    App.check_duplicate_paths(name, paths)
+    App.check_duplicate_paths(paths)
 
     # update track data and file
     track_data.setdefault(name, {})
@@ -70,13 +70,14 @@ def add(name, paths):
         if selected == "abort":
             utils.warn("aborted!")
             break
+
         if selected == "skip":
             utils.warn(f"skipped {p}")
             continue
-        else:
-            utils.link(p, link_to, selected)
-            track_data[name][device_id].append(p)
-            utils.success(f"added {p}")
+
+        utils.link(p, link_to, selected)
+        track_data[name][device_id].append(p)
+        utils.success(f"added {p}")
 
     # write track data to track file
     App.update_track_data(track_data)
