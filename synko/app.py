@@ -10,11 +10,17 @@ from synko.constants import (
     STORAGE_DIR,
     SYNKO_STORAGE_DIR,
     SYNKO_TRACK_FILE,
+    STORAGE_DIR_NOT_FOUND,
 )
 
 
 class Synko:
     def __init__(self):
+
+        # exit if storage path does not exist
+        if not os.path.exists(STORAGE_DIR):
+            utils.error(STORAGE_DIR_NOT_FOUND.format(STORAGE_DIR))
+
         # default metadata
         self.__metadata = {}
         self.__metadata["APP_DATA_DIR"] = APP_DATA_DIR
@@ -49,14 +55,6 @@ class Synko:
         self.__metadata[
             "SYNKO_DEVICE_ID"
         ] = f'{self.__appdata["PLATFORM"]}~{self.__appdata["UID"]}'
-
-        # if storage path exists (dropbox path)
-        if not os.path.exists(self.__appdata["STORAGE_DIR"]):
-            utils.error(
-                f"""storage directory '{self.__appdata['STORAGE_DIR']}' not found!
-                Make sure you have dropbox installed!
-                """
-            )
 
         # synko storage dir exists? no: create one
         # synko storage dir is dropbox_path/synko

@@ -178,7 +178,6 @@ def read_yml_file(filepath, default_data={}):
     """
     with open(filepath, "a+") as f:
         try:
-
             file_size = os.stat(filepath).st_size
 
             if file_size == 0:

@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import os
 import click
+
 from synko import utils
 from synko.app import Synko
 from synko.constants import (
@@ -168,14 +169,29 @@ def remove(name, all):
 
 # info command
 @main.command()
-# @click.option("-p", "--storage-path", type=str, default="", prompt=True)
+@click.option(
+    "-p",
+    "--storage-path",
+    type=str,
+    default="",
+    help="takes path to the storage directory (Dropbox folder as of now)",
+)
 def info(storage_path):
     """displays current settings for synko"""
     if len(storage_path) == 0:
         App.display_synko_info()
+        return
 
-    # TODO: add storage and storage path update feature
-    # App.update_storage(storage_path) for this feature
+    storage_path = os.path.realpath(storage_path)
+
+    if not os.path.isdir(storage_path):
+        utils.error(f"make sure that '{storage_path}' exists and is a directory")
+
+    if utils.is_path_in_app_data_dir(storage_path):
+        utils.error(f"'{storage_path}' is used by synko, so it cannot be used")
+
+    App.update_storage(storage_path)
+    utils.success(f"'{storage_path}' updated!")
 
 
 if __name__ == "__main__":
