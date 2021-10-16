@@ -17,10 +17,6 @@ from synko.constants import (
 class Synko:
     def __init__(self):
 
-        # exit if storage path does not exist
-        if not os.path.exists(STORAGE_DIR):
-            utils.error(STORAGE_DIR_NOT_FOUND.format(STORAGE_DIR))
-
         # default metadata
         self.__metadata = {}
         self.__metadata["APP_DATA_DIR"] = APP_DATA_DIR
@@ -41,6 +37,10 @@ class Synko:
     # TODO: init app
     def init_app(self):
         """initialize synko before command execution"""
+
+        # warn: storage path does not exist, synko will create one
+        if not os.path.exists(STORAGE_DIR):
+            utils.warn()(STORAGE_DIR_NOT_FOUND.format(storagepath=STORAGE_DIR))
 
         # App data directory exists? no : create one
         os.makedirs(self.__metadata["APP_DATA_DIR"], exist_ok=True)
@@ -118,10 +118,10 @@ class Synko:
 
         for config in track_data:
             if track_data[config][device_id] is not None:
-                print(f"[*] {config}")
+                print(f"[+] {config}")
 
                 for config_path in track_data[config][device_id]:
-                    print(f" [-] {config_path}")
+                    print(f" |__ {config_path}")
 
     def check_duplicate_paths(self, file_paths):
         """
