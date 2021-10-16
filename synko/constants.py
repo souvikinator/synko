@@ -1,7 +1,7 @@
 import os
 
 APP_NAME = "synko"
-APP_VERISON = "0.0.4"
+APP_VERISON = "0.0.5"
 
 # user specific consts
 USER_HOME_DIR = os.path.expanduser("~")
@@ -60,8 +60,9 @@ Looks like backup file of '{path}' already exists on this device and may have di
 For more information select abort and visit https://github.com/souvikinator/synko/blob/master/README.md#conflict .
 """
 
-STORAGE_DIR_NOT_FOUND = """
-storage directory '{storagepath}' not found!
+STORAGE_DIR_NOT_FOUND = """storage directory '{storagepath}' not found! 
+
+Synko is explicitly going to create '{storagepath}'
 
 Make sure you have dropbox installed! If the dropbox folder is on another path then use following to update the path to storage folder:
 
