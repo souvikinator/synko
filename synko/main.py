@@ -98,8 +98,7 @@ def index(name):
     if len(track_data) == 0:
         utils.error("nothing to list")
 
-    if name:
-        App.display_track_data()
+    App.display_track_data()
 
 
 # remove command
