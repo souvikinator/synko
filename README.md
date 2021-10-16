@@ -9,15 +9,14 @@
 
 <h4 align="center">Sync application configuration and settings across multiple multiplatform devices. Currently supports Linux and Darwin(macos).</h4>
 <p align="center">
-  <a href="#key-features">Key Features</a> •
+  <a href="#features">Key Features</a> •
   <a href="#how-to-use">How To Use</a> •
-  <a href="#download">Download and Install</a> •
+  <a href="#install">Install</a> •
   <a href="#setup">Setup</a>
 </p>
 
 [![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
-
-
+[![GitHub issues](https://img.shields.io/github/issues/souvikinator/synko)](https://github.com/souvikinator/synko/issues)
 
 > **Work in progress for windows**
 
@@ -25,14 +24,46 @@
 
 # Features
 
+- this
+- that
+- this
+- that
+
+
+# How to use
+
+### add
+
+```bash
+synko add [configname] [paths...]
+```
+
+### remove
+
+```bash
+synko remove [configname]
+```
+
+### index
+
+```bash
+synko index
+```
+
+### info
+
+```bash
+synko info [options]
+```
+
+
 # Install
 
-# Usage
+Install synko with pip
 
-## add
+```bash
+  pip install synko
+```
+# Setup
 
-## remove
 
-## index
-
-## info
