@@ -8,6 +8,15 @@
 </h1>
 
 <h4 align="center">Sync application configuration and settings across multiple multiplatform devices. Currently supports Linux and Darwin(macos).</h4>
+
+<p align="center">
+  <a href="https://opensource.org/licenses/">
+    <img src="https://img.shields.io/badge/License-GPL%20v3-yellow.svg"
+         alt="license">
+  </a>
+  <a href="https://github.com/souvikinator/synko/issues"><img src="https://img.shields.io/github/issues/souvikinator/synko"></a>
+</p>
+
 <p align="center">
   <a href="#features">Key Features</a> •
   <a href="#how-to-use">How To Use</a> •
@@ -15,8 +24,6 @@
   <a href="#setup">Setup</a>
 </p>
 
-[![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
-[![GitHub issues](https://img.shields.io/github/issues/souvikinator/synko)](https://github.com/souvikinator/synko/issues)
 
 > **Work in progress for windows**
 
