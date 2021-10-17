@@ -138,10 +138,13 @@ class Synko:
         found = 0
         for config in track_data:
             if device_id in track_data[config]:
+                found += 1
+                print(f"[+] {config}")  # TODO: orange (only the config not [+])
+
                 for config_path in track_data[config][device_id]:
-                    found += 1
-                    print(f"[+] {config}")
-                    print(f" |__ {config_path}")
+                    print(
+                        f" |__ {config_path}"
+                    )  # TODO: cyan (only config_path not |__ )
 
         if not found:
             utils.error("Nothing to list")
