@@ -152,19 +152,15 @@ def remove(name):
 
     # check if to_be_removed_paths are associated with any other
     # device id, if not then delete the backup file
-    found = False
+    to_be_deleted_backups = to_be_removed_paths
     for device in track_data[name]:
         if device != device_id:
             for p in to_be_removed_paths:
                 if p in track_data[name][device]:
-                    found = True
+                    to_be_deleted_backups.remove(p)
                     break
 
-        # exit outer loop
-        if found:
-            break
-
-    if not found:
+    for p in to_be_deleted_backups:
         utils.delete_backup(p, synko_storage_dir)
 
     # remove/delete file

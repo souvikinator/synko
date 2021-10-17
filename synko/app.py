@@ -78,12 +78,11 @@ class Synko:
         """
         reads track file and expands all the config path
         """
-        device_id = self.device_id()
         track_data = utils.read_yml_file(self.__appdata["SYNKO_TRACK_FILE"])
 
         if len(track_data) > 0:
             for config in track_data:
-                if device_id in track_data[config]:
+                for device_id in track_data[config]:
                     utils.expand_all_paths(track_data[config][device_id])
 
         return track_data
@@ -93,11 +92,11 @@ class Synko:
         updates track file with data and also shortens the path
         """
         track_data = self.__trackdata
-        device_id = self.device_id()
 
         if len(track_data) > 0:
             for config in track_data:
-                utils.shorten_all_paths(track_data[config][device_id])
+                for device_id in track_data[config]:
+                    utils.shorten_all_paths(track_data[config][device_id])
 
         # write to file
         utils.write_yml_file(track_data, self.__appdata["SYNKO_TRACK_FILE"])
