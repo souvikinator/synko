@@ -145,14 +145,15 @@ class Synko:
                     print(
                         f" |__ {config_path}"
                     )  # TODO: cyan (only config_path not |__ )
+                print("\n")
 
         if not found:
             utils.error("Nothing to list")
 
     # update storage dir
     def update_storage_path(self, dirpath=None):
-        if dir is not None:
-            self.__appdata["STORAGE_DIR"] = dirpath or self.__appdata["STORAGE_DIR"]
+        if dirpath is not None:
+            self.__appdata["STORAGE_DIR"] = dirpath
             self.__appdata["SYNKO_STORAGE_DIR"] = os.path.join(
                 self.__appdata["STORAGE_DIR"], SYNKO_STORAGE_DIR
             )
