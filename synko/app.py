@@ -17,39 +17,39 @@ from synko.constants import (
 class Synko:
     def __init__(self):
 
-        # default metadata
-        self.__metadata = {}
-        self.__metadata["APP_DATA_DIR"] = APP_DATA_DIR
-        self.__metadata["APP_DATA_FILE"] = APP_DATA_FILE
-        self.__metadata["SYNKO_TRACK_FILE"] = SYNKO_TRACK_FILE
-        self.__metadata["SYNKO_STORAGE_DIR"] = SYNKO_STORAGE_DIR
-        self.__metadata["SYNKO_DEVICE_ID"] = ""
-
         # app data
         self.__appdata = {}
         self.__appdata["PLATFORM"] = platform.system()
         self.__appdata["UID"] = str(uuid.uuid4())
         self.__appdata["STORAGE_DIR"] = STORAGE_DIR
+        self.__appdata["SYNKO_TRACK_FILE"] = os.path.join(STORAGE_DIR,SYNKO_TRACK_FILE)
+        self.__appdata["SYNKO_STORAGE_DIR"] = os.path.join(STORAGE_DIR,SYNKO_STORAGE_DIR)
+
+        # default metadata
+        self.__metadata = {}
+        self.__metadata["APP_DATA_DIR"] = APP_DATA_DIR
+        self.__metadata["APP_DATA_FILE"] = APP_DATA_FILE
+        self.__metadata["SYNKO_DEVICE_ID"] = ""
 
         # track data
         self.__trackdata = {}
 
-    # TODO: init app
+    #init app
     def init_app(self):
         """initialize synko before command execution"""
 
         # warn: storage path does not exist, synko will create one
         if not os.path.exists(STORAGE_DIR):
-            utils.warn()(STORAGE_DIR_NOT_FOUND.format(storagepath=STORAGE_DIR))
+            utils.warn(STORAGE_DIR_NOT_FOUND.format(storagepath=STORAGE_DIR))
+
+        # TODO: add a confirm prompt: yes? continue, no? sys.exit()
 
         # App data directory exists? no : create one
         os.makedirs(self.__metadata["APP_DATA_DIR"], exist_ok=True)
 
-        # read app data.if not exists, create one
-        # populate empty file with default data
-        self.__appdata = utils.read_yml_file(
-            self.__metadata["APP_DATA_FILE"], self.__appdata
-        )
+        # read app data and set storage dir and track file path
+        self.__appdata = self.__load_app_data()
+       
 
         # set device id
         self.__metadata[
@@ -58,19 +58,26 @@ class Synko:
 
         # synko storage dir exists? no: create one
         # synko storage dir is dropbox_path/synko
-        os.makedirs(self.__metadata["SYNKO_STORAGE_DIR"], exist_ok=True)
+        os.makedirs(self.__appdata["SYNKO_STORAGE_DIR"], exist_ok=True)
 
         # read track data, if does not exist create one
         self.__trackdata = self.__load_tracking_file()
 
         # all good to go
+    
+    def __load_app_data(self):
+        data=utils.read_yml_file(
+            self.__metadata["APP_DATA_FILE"], self.__appdata
+        )
+
+        return data
 
     def __load_tracking_file(self):
         """
         reads track file and expands all the config path
         """
         device_id = self.device_id()
-        track_data = utils.read_yml_file(self.__metadata["SYNKO_TRACK_FILE"])
+        track_data = utils.read_yml_file(self.__appdata["SYNKO_TRACK_FILE"])
 
         if len(track_data) > 0:
             for config in track_data:
@@ -91,17 +98,25 @@ class Synko:
                 utils.shorten_all_paths(track_data[config][device_id])
 
         # write to file
-        utils.write_yml_file(track_data, self.__metadata["SYNKO_TRACK_FILE"])
+        utils.write_yml_file(track_data, self.__appdata["SYNKO_TRACK_FILE"])
 
     def display_synko_info(self):
         """displays synko data/info"""
         for key in self.__appdata:
-            utils.info(f"{key} : {self.__appdata[key]}")
+            if key not in ("SYNKO_STORAGE_DIR", "SYNKO_TRACK_FILE"):
+                utils.info(f"{key} : {self.__appdata[key]}")
 
     # update storage dir
-    def update_storage(self, dirpath=None):
+    def update_storage_path(self, dirpath=None):
         if dir is not None:
             self.__appdata["STORAGE_DIR"] = dirpath or self.__appdata["STORAGE_DIR"]
+            self.__appdata["SYNKO_STORAGE_DIR"]=os.path.join(self.__appdata[
+                "STORAGE_DIR"
+            ],SYNKO_STORAGE_DIR)
+            self.__appdata["SYNKO_TRACK_FILE"]=os.path.join(self.__appdata[
+                "STORAGE_DIR"
+            ],SYNKO_TRACK_FILE)
+
             utils.write_yml_file(self.__appdata, self.__metadata["APP_DATA_FILE"])
 
     # get app data

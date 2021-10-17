@@ -5,6 +5,7 @@ import click
 from synko import utils
 from synko.app import Synko
 from synko.constants import (
+    APP_DATA_DIR,
     APP_NAME,
     APP_VERISON,
     SYNKO_ADD_CONFLICT,
@@ -43,13 +44,14 @@ def add(name, paths):
     """
     paths = list(set(paths))
     track_data = App.get_track_data()
+    app_data=App.get_appdata()
     device_id = App.device_id()
 
     if len(paths) == 0:
         utils.error("no paths specified!")
 
     # perform various checks and validate
-    utils.validate_config_paths(paths)
+    utils.validate_config_paths(paths,app_data)
 
     # check if paths already exists in track file?
     App.check_duplicate_paths(paths)
@@ -61,7 +63,7 @@ def add(name, paths):
     # form links and update track data
     for p in paths:
         selected = 0
-        link_to = utils.generate_link_path(p)
+        link_to = utils.generate_link_path(p,app_data["SYNKO_STORAGE_DIR"])
 
         # if link_to exists then ask for confirmation
         if os.path.exists(link_to):
@@ -107,9 +109,10 @@ def index(name):
 # TODO: @click.option(
 #     "--all", "-a", is_flag=True, help="remove all config files under config name"
 # )
-def remove(name, all):
+def remove(name):
     """remove specific config file from synko"""
     track_data = App.get_track_data()
+    app_data=App.get_appdata()
     device_id = App.device_id()
 
     if name not in track_data:
@@ -138,7 +141,7 @@ def remove(name, all):
 
     # unlink src from link_to
     for p in to_be_removed_paths:
-        link_to = utils.generate_link_path(p)
+        link_to = utils.generate_link_path(p,app_data["SYNKO_STORAGE_DIR"])
         utils.unlink(p, link_to)
         utils.success(f"removed {p}")
 
@@ -186,11 +189,11 @@ def info(storage_path):
     if not os.path.isdir(storage_path):
         utils.error(f"make sure that '{storage_path}' exists and is a directory")
 
-    if utils.is_path_in_app_data_dir(storage_path):
+    if utils.is_path_in_app_data_dir(storage_path,APP_DATA_DIR):
         utils.error(f"'{storage_path}' is used by synko, so it cannot be used")
 
-    App.update_storage(storage_path)
-    utils.success(f"'{storage_path}' updated!")
+    App.update_storage_path(storage_path)
+    utils.success(f"storage path updated to '{storage_path}'")
 
 
 if __name__ == "__main__":

@@ -12,8 +12,8 @@ APP_DATA_FILE = os.path.join(APP_DATA_DIR, "data.yml")
 
 STORAGE_NAME = "Dropbox"
 STORAGE_DIR = os.path.join(USER_HOME_DIR, "Dropbox")
-SYNKO_STORAGE_DIR = os.path.join(STORAGE_DIR, "synko")
-SYNKO_TRACK_FILE = os.path.join(SYNKO_STORAGE_DIR, ".track")
+SYNKO_STORAGE_DIR ="synko"
+SYNKO_TRACK_FILE =".track"
 
 
 SYNKO_BANNER = f"""        
