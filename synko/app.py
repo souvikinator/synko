@@ -190,7 +190,7 @@ class Synko:
         args:
             config_paths (list)
         """
-        synko_storage_dir = self.__appdata["SYNKO_STORAGE_DATA"]
+        synko_storage_dir = self.__appdata["SYNKO_STORAGE_DIR"]
 
         utils.get_real_paths(config_paths)
 
