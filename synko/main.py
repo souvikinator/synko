@@ -107,7 +107,7 @@ def index(name):
 # TODO: @click.option(
 #     "--all", "-a", is_flag=True, help="remove all config files under config name"
 # )
-def remove(name, all):
+def remove(name):
     """remove specific config file from synko"""
     track_data = App.get_track_data()
     device_id = App.device_id()
