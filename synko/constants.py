@@ -1,3 +1,5 @@
+""" contains all synko specific constants """
+
 import os
 
 APP_NAME = "synko"
@@ -12,8 +14,8 @@ APP_DATA_FILE = os.path.join(APP_DATA_DIR, "data.yml")
 
 STORAGE_NAME = "Dropbox"
 STORAGE_DIR = os.path.join(USER_HOME_DIR, "Dropbox")
-SYNKO_STORAGE_DIR ="synko"
-SYNKO_TRACK_FILE =".track"
+SYNKO_STORAGE_DIR = "synko"
+SYNKO_TRACK_FILE = ".track"
 
 
 SYNKO_BANNER = f"""        

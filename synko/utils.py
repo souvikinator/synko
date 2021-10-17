@@ -5,82 +5,20 @@ import shutil
 import yaml
 import inquirer
 
-from synko.constants import APP_DATA_DIR
 
-
-def validate_config_paths(configPaths,app_data):
-    """
-    working:
-        - remove path which do not exist
-        - get real path and remove duplicates
-        - remove paths which are outside home dir
-
-    args:
-        configPaths (list)
-    """
-    synko_storage_dir=app_data["SYNKO_STORAGE_DIR"]
-
-    get_real_paths(configPaths)
-
-    # remove paths which do not exist
-    configPaths, removed_paths = remove_non_existing_paths(configPaths)
-
-    # showing warning for removed paths
-    if len(removed_paths) > 0:
-        for path in removed_paths:
-            warn(f"'{path}' not found")
-        sys.exit(0)
-
-    # get real path, of each path
-    get_real_paths(configPaths)
-
-    # remove duplicates after getting real paths
-    configPaths = list(set(configPaths))
-
-    # remove paths which are not in home directory
-    # for now it only allows config files within home dir
-    configPaths, removed_paths = remove_paths_outside_home_dir(configPaths)
-
-    # showing warning for removed paths
-    if len(removed_paths) > 0:
-        for path in removed_paths:
-            warn(f"'{path}' outside home directory, cannot be used")
-        sys.exit(0)
-
-    # remove paths which are inside dropbox/synko
-    configPaths, removed_paths = remove_paths_in_storage_dir(configPaths,synko_storage_dir)
-
-    # showing warning for removed paths
-    if len(removed_paths) > 0:
-        for path in removed_paths:
-            warn(f"'{path}' cannot be used as it is used by synko")
-        sys.exit(0)
-
-    # removed paths which are inside app data directory (.synko)
-    configPaths, removed_paths = remove_paths_in_app_data_dir(configPaths,APP_DATA_DIR)
-
-    # showing warning for removed paths
-    if len(removed_paths) > 0:
-        for path in removed_paths:
-            warn(f"'{path}' cannot be used as it is used by synko")  # yellow
-        sys.exit(0)
-
-    # boom! all done ig?
-
-
-def remove_paths_in_storage_dir(configPaths,synko_storage_dir):
+def remove_paths_in_storage_dir(config_paths, synko_storage_dir):
     """
     - removes paths from provided lists which are inside dropbox/synko
 
     Returns:
-        `removed_paths (list)`: list of paths from configPaths which were removed
-        `tmp_paths (list)`: list of paths from configPaths which were not removed
+        `removed_paths (list)`: list of paths from config_paths which were removed
+        `tmp_paths (list)`: list of paths from config_paths which were not removed
     """
     removed_paths = []
     tmp_paths = []
 
-    for p in configPaths:
-        if is_path_in_storage_dir(p,synko_storage_dir):
+    for p in config_paths:
+        if is_path_in_storage_dir(p, synko_storage_dir):
             removed_paths.append(p)
         else:
             tmp_paths.append(p)
@@ -88,19 +26,19 @@ def remove_paths_in_storage_dir(configPaths,synko_storage_dir):
     return tmp_paths, removed_paths
 
 
-def remove_paths_in_app_data_dir(configPaths,app_data_dir):
+def remove_paths_in_app_data_dir(config_paths, app_data_dir):
     """
-    - removes paths (among configPaths) which are inside ~/.synko/
+    - removes paths (among config_paths) which are inside ~/.synko/
 
     Returns:
-        `removed_paths (list)`: list of paths from configPaths which were removed
-        `tmp_paths (list)`: list of paths from configPaths which were not removed
+        `removed_paths (list)`: list of paths from config_paths which were removed
+        `tmp_paths (list)`: list of paths from config_paths which were not removed
     """
     removed_paths = []
     tmp_paths = []
 
-    for p in configPaths:
-        if is_path_in_app_data_dir(p,app_data_dir):
+    for p in config_paths:
+        if is_path_in_app_data_dir(p, app_data_dir):
             removed_paths.append(p)
         else:
             tmp_paths.append(p)
@@ -108,28 +46,35 @@ def remove_paths_in_app_data_dir(configPaths,app_data_dir):
     return tmp_paths, removed_paths
 
 
-def is_path_in_storage_dir(configPath, synko_storage_dir):
-    return synko_storage_dir in configPath
+def is_path_in_storage_dir(config_path, synko_storage_dir):
+    """
+    checks if a path is in the synko storage directory
+
+    Args:
+        `config_path` (str),
+        `synko_storage_dir` (str)
+    """
+    return synko_storage_dir in config_path
 
 
-def is_path_in_app_data_dir(configPath,app_data_dir):
-    return app_data_dir in configPath
+def is_path_in_app_data_dir(config_path, app_data_dir):
+    return app_data_dir in config_path
 
 
-def remove_non_existing_paths(configPaths):
+def remove_non_existing_paths(config_paths):
     """
     - removes paths which do not exist
 
     args:
-        configPaths (list)
+        `config_paths` (list)
 
     Returns:
-        `removed_paths (list)`: list of paths from configPaths which were removed
-        `tmp_paths (list)`: list of paths from configPaths which were not removed
+        `removed_paths` (list): list of paths from config_paths which were removed
+        `tmp_paths` (list): list of paths from config_paths which were not removed
     """
     non_existing_paths = []
     tmp_paths = []
-    for p in configPaths:
+    for p in config_paths:
         if not os.path.exists(p):
             non_existing_paths.append(p)
         else:
@@ -138,26 +83,27 @@ def remove_non_existing_paths(configPaths):
     return tmp_paths, non_existing_paths
 
 
-def get_real_paths(configPaths):
-    for i, p in enumerate(configPaths):
-        configPaths[i] = os.path.realpath(p)
+def get_real_paths(config_paths):
+    """updates paths in config_paths to their real path"""
+    for i, p in enumerate(config_paths):
+        config_paths[i] = os.path.realpath(p)
 
 
-def remove_paths_outside_home_dir(configPaths):
+def remove_paths_outside_home_dir(config_paths):
     """
     - removes paths which are outside the home dir
 
-    NOTE: at this point synko only allows configs inside the home dir
+    NOTE: at this point synko only allows configs inside the home dir only
 
     Returns:
-        removed_paths (list): list of paths from configPaths which were removed
-        tmp_paths (list): list of paths from configPaths which were not removed
+        removed_paths (list): list of paths from config_paths which were removed
+        tmp_paths (list): list of paths from config_paths which were not removed
     """
     removed_path = []
     tmp_paths = []
     homedir = os.path.expanduser("~")
 
-    for p in configPaths:
+    for p in config_paths:
         if not p.startswith(homedir):
             removed_path.append(p)
         else:
@@ -167,9 +113,16 @@ def remove_paths_outside_home_dir(configPaths):
 
 
 def write_yml_file(data, filepath):
+    """write data to yaml file"""
     try:
         with open(filepath, "w") as f:
             yaml.dump(data, f)
+    except yaml.YAMLError as e:
+        print(e)
+        error("Error writing yaml file!")
+    except FileExistsError as e:
+        print(e)
+        error(f"{filepath} not found")
     except Exception as e:
         error(e)
 
@@ -203,10 +156,11 @@ def read_yml_file(filepath, default_data={}):
 
 def expand_all_paths(file_paths):
     """
-    expands ~ to home directory in list of paths
+    - expands ~ to home directory in list of paths
+    - calls `expand_path()` internally
 
     Args:
-        file_paths (list) : list of paths to expand
+        `file_paths` (list) : list of paths to expand
     """
     for i, fp in enumerate(file_paths):
         file_paths[i] = expand_path(fp)
@@ -214,50 +168,34 @@ def expand_all_paths(file_paths):
 
 def shorten_all_paths(file_paths):
     """
-    expands home directory to ~ in list of paths
+    - expands home directory to ~ in list of paths
+    - calls `shoten_path()` internally
 
     Args:
-        file_paths (list) : list of paths to shorten
+        `file_paths` (list) : list of paths to shorten
     """
     for i, fp in enumerate(file_paths):
         file_paths[i] = shorten_path(fp)
 
 
 def expand_path(file_path):
-    """
-    expand ~ -> home directory in any path
-
-    Args:
-        file_path (str)
-
-    Return:
-        expanded_path (str)
-    """
+    """- expand ~ -> home directory in any path"""
     return file_path.replace("~", os.path.expanduser("~"))
 
 
 def shorten_path(file_path):
-    """
-    expand home directory to ~ in any path
-
-    Args:
-        file_path (str)
-
-    Return:
-        expanded_path (str)
-    """
+    """- expand home directory to ~ in any path"""
     return file_path.replace(os.path.expanduser("~"), "~")
 
 
-def generate_link_path(src_path,synko_storage_dir):
-    """about function"""
+def generate_link_path(src_path, synko_storage_dir):
+    """- generate backup file path using the original file path"""
     base_name = os.path.basename(src_path)
     return os.path.join(synko_storage_dir, base_name)
 
 
-# TODO: handle keyboard interupt
 def select_option(msg, options):
-    """select only one"""
+    """- select only one option prompt"""
     option_count = len(options)
     if option_count == 0:
         return None
@@ -276,9 +214,8 @@ def select_option(msg, options):
     return None
 
 
-# TODO: handle keyboard interupt
 def select_options(msg, options):
-    """select many options"""
+    """- select many options prompt"""
     option_count = len(options)
     if option_count == 0:
         return []
@@ -297,23 +234,8 @@ def select_options(msg, options):
     return []
 
 
-def link_all(paths):
-    """
-    - calls `link()` on each paths
-
-    Args:
-        `paths (list)`: list of config paths
-
-    `TODO:` chmod on link_to
-    if link_to is file: chmod 600
-    if link_to is folder: chmod 700
-    """
-    for p in paths:
-        link_to = generate_link_path(p)
-        link(p, link_to)
-
-
 def delete_path(path):
+    """delete file/dir"""
     if os.path.isdir(path):
         shutil.rmtree(path)
     elif os.path.isfile(path):
@@ -321,6 +243,7 @@ def delete_path(path):
 
 
 def copy_path(src, dest):
+    """copy file/dir from src to dest"""
     if os.path.isdir(src):
         shutil.copytree(src, dest)
     elif os.path.isfile(src):
@@ -358,7 +281,7 @@ def unlink(src, link_to):
 
     Args:
         `src (str)`: path to original file
-        `link_to (str)`: path where src will be moved to
+        `link_to (str)`: path where src will be moved to (backup path)
     """
     if os.path.exists(src) and os.path.realpath(src) == link_to:
         # delete src
@@ -367,9 +290,15 @@ def unlink(src, link_to):
         copy_path(link_to, src)
 
 
-def delete_backup(p):
-    """delete backup file"""
-    link_to = generate_link_path(p)
+def delete_backup(filepath, synko_storage_dir):
+    """
+    - generate backup file path (link_to) from filepath arg and delete
+
+    Args:
+        `filepath`: path to origin file
+        `synko_storage_dir`: path to synko storage directory
+    """
+    link_to = generate_link_path(filepath, synko_storage_dir)
     delete_path(link_to)
 
 
