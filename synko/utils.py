@@ -4,10 +4,11 @@ import sys
 import shutil
 import yaml
 import inquirer
-from synko.constants import APP_DATA_DIR, SYNKO_STORAGE_DIR
+
+from synko.constants import APP_DATA_DIR
 
 
-def validate_config_paths(configPaths):
+def validate_config_paths(configPaths,app_data):
     """
     working:
         - remove path which do not exist
@@ -17,6 +18,8 @@ def validate_config_paths(configPaths):
     args:
         configPaths (list)
     """
+    synko_storage_dir=app_data["SYNKO_STORAGE_DIR"]
+
     get_real_paths(configPaths)
 
     # remove paths which do not exist
@@ -45,7 +48,7 @@ def validate_config_paths(configPaths):
         sys.exit(0)
 
     # remove paths which are inside dropbox/synko
-    configPaths, removed_paths = remove_paths_in_storage_dir(configPaths)
+    configPaths, removed_paths = remove_paths_in_storage_dir(configPaths,synko_storage_dir)
 
     # showing warning for removed paths
     if len(removed_paths) > 0:
@@ -54,7 +57,7 @@ def validate_config_paths(configPaths):
         sys.exit(0)
 
     # removed paths which are inside app data directory (.synko)
-    configPaths, removed_paths = remove_paths_in_app_data_dir(configPaths)
+    configPaths, removed_paths = remove_paths_in_app_data_dir(configPaths,APP_DATA_DIR)
 
     # showing warning for removed paths
     if len(removed_paths) > 0:
@@ -65,7 +68,7 @@ def validate_config_paths(configPaths):
     # boom! all done ig?
 
 
-def remove_paths_in_storage_dir(configPaths):
+def remove_paths_in_storage_dir(configPaths,synko_storage_dir):
     """
     - removes paths from provided lists which are inside dropbox/synko
 
@@ -77,7 +80,7 @@ def remove_paths_in_storage_dir(configPaths):
     tmp_paths = []
 
     for p in configPaths:
-        if is_path_in_storage_dir(p):
+        if is_path_in_storage_dir(p,synko_storage_dir):
             removed_paths.append(p)
         else:
             tmp_paths.append(p)
@@ -85,7 +88,7 @@ def remove_paths_in_storage_dir(configPaths):
     return tmp_paths, removed_paths
 
 
-def remove_paths_in_app_data_dir(configPaths):
+def remove_paths_in_app_data_dir(configPaths,app_data_dir):
     """
     - removes paths (among configPaths) which are inside ~/.synko/
 
@@ -97,7 +100,7 @@ def remove_paths_in_app_data_dir(configPaths):
     tmp_paths = []
 
     for p in configPaths:
-        if is_path_in_app_data_dir(p):
+        if is_path_in_app_data_dir(p,app_data_dir):
             removed_paths.append(p)
         else:
             tmp_paths.append(p)
@@ -105,12 +108,12 @@ def remove_paths_in_app_data_dir(configPaths):
     return tmp_paths, removed_paths
 
 
-def is_path_in_storage_dir(configPath):
-    return SYNKO_STORAGE_DIR in configPath
+def is_path_in_storage_dir(configPath, synko_storage_dir):
+    return synko_storage_dir in configPath
 
 
-def is_path_in_app_data_dir(configPath):
-    return APP_DATA_DIR in configPath
+def is_path_in_app_data_dir(configPath,app_data_dir):
+    return app_data_dir in configPath
 
 
 def remove_non_existing_paths(configPaths):
@@ -187,7 +190,7 @@ def read_yml_file(filepath, default_data={}):
                 f.seek(0)
                 data = yaml.safe_load(f)
         except FileNotFoundError:
-            error(f"File {file_size} not found.  Aborting")
+            error(f"File {filepath} not found.  Aborting")
         except OSError:
             error(f"OS error occurred trying to open {filepath}")
         except yaml.YAMLError:
@@ -246,10 +249,10 @@ def shorten_path(file_path):
     return file_path.replace(os.path.expanduser("~"), "~")
 
 
-def generate_link_path(src_path):
+def generate_link_path(src_path,synko_storage_dir):
     """about function"""
     base_name = os.path.basename(src_path)
-    return os.path.join(SYNKO_STORAGE_DIR, base_name)
+    return os.path.join(synko_storage_dir, base_name)
 
 
 # TODO: handle keyboard interupt
