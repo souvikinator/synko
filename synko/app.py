@@ -175,11 +175,12 @@ class Synko:
         track_data = self.get_track_data()
 
         for config in track_data:
-            existing_paths = track_data[config][device_id] or []
-            for p in existing_paths:
-                if p in file_paths:
-                    found += 1
-                    utils.warn(f"'{p}' is already added for sync under '{config}'")
+            if device_id in track_data[config]:
+                existing_paths = track_data[config][device_id] or []
+                for p in existing_paths:
+                    if p in file_paths:
+                        found += 1
+                        utils.warn(f"'{p}' is already added for sync under '{config}'")
 
         if found > 0:
             utils.error("aborting!")
