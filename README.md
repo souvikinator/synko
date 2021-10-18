@@ -15,12 +15,12 @@
 </p>
 
 <p align="center">
-  <a href="#features">✨ Key Features</a> •
-  <a href="#how-to-use">📑 How To Use</a> •
-  <a href="#install">⚗️ Installation</a> •
-  <a href="#setup">🛠️ Setup</a> •
-  <a href="#contribution">👨🧑 Contribution</a> •
-  <a href="#faq">🤔 FAQ</a> 
+  <a href="#-features">✨ Key Features</a> •
+  <a href="#-how-to-use">📑 How To Use</a> •
+  <a href="#%EF%B8%8F-install">⚗️ Installation</a> •
+  <a href="#%EF%B8%8F-setup">🛠️ Setup</a> •
+  <a href="#-contribution">👨🧑 Contribution</a> •
+  <a href="#-faq">🤔 FAQ</a> 
 </p>
 
 # ✨ Features
