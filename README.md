@@ -31,6 +31,7 @@
 
 - Sync application settings and configuration files across multiple devices (linux and macos)
 - Works with dropbox as of now (support for more soon)
+- User gets the freedom to add path to the config and setting files.
 - Freedom to sync specific set of files across specific set of devices. Here is an example:
 
 ![feature-1-2](https://github.com/souvikinator/synko/blob/master/assets/feature-1-2.png)
@@ -39,12 +40,12 @@
 
 ### add
 
-**Usage:**: `synko add [configname] [paths...]`
+**Usage:** `synko add [configname] [paths...]`
 
 - add file to synko
 
 ```bash
-synko add config1 ~/.config/random_app/test1.conf
+synko add nvim ~/.config/nvim/init.vim
 ```
 
 ![add command 1](https://github.com/souvikinator/synko/raw/master/assets/add-cmd-1.gif)
@@ -53,22 +54,41 @@ synko add config1 ~/.config/random_app/test1.conf
 - adding multiple files under same config name
 
 ```bash
-synko add config1 ~/.config/random_app/test1.conf ~/.config/random_app/test2.conf
+synko add config1 ~/.config/random_app/test2.conf ~/.config/random_app/test3.conf
 ```
 
 ![add command 2](https://github.com/souvikinator/synko/blob/master/assets/add-cmd-2.gif)
 
+- synking same file in different device
+
+![syncing across files](https://github.com/souvikinator/synko/blob/master/assets/synko-add-other-device.gif)
+
 ### index
+
+list all the added configurations and settings
+
+**Usage:** `synko index`
 
 ```bash
 synko index
 ```
 
+![index](https://github.com/souvikinator/synko/blob/master/assets/index-cmd.gif)
+
 ### remove
+
+remove specific added configuration/settings file from synko
 
 ```bash
 synko remove [configname]
 ```
+
+it asks to select one or multiple files one wants to remove from synko, user **right arrow key to select** and **left arrow key to unselect** , **up and down arrow key** to navigate.
+
+![remove](https://github.com/souvikinator/synko/raw/master/assets/remove-cmd-1.gif)
+
+If you don't want to remove any then select no options and press enter, the process will be aborted 
+
 
 ### info
 
