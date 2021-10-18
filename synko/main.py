@@ -58,26 +58,37 @@ def add(name, paths):
 
     # form links and update track data
     for p in paths:
-        selected = 0
+        selected_mode = 0
         link_to = utils.generate_link_path(p, app_data["SYNKO_STORAGE_DIR"])
 
         # if link_to exists and is not empty, then ask for confirmation
-        if os.path.exists(link_to) and (os.stat(p).st_size > 0 or any(os.scandir(p))):
-            print(SYNKO_ADD_CONFLICT.format(path=p))
-            selected = utils.select_option("Select option", [0, 1, "skip", "abort"])
+        if os.path.exists(link_to):
+            if (os.path.isfile(p) and os.stat(p).st_size == 0) or (
+                os.path.isdir(p) and not any(os.scandir(p))
+            ):
+                selected_mode = 1
 
-        if selected == "abort":
+            elif (os.path.isfile(p) and os.stat(p).st_size > 0) or (
+                os.path.isdir(p) and any(os.scandir(p))
+            ):
+                # CONFLICT! let user select the best
+                utils.warn(SYNKO_ADD_CONFLICT.format(path=p))
+                selected_mode = utils.select_option(
+                    "Select option", [0, 1, "skip", "abort"]
+                )
+
+        if selected_mode == "abort":
             utils.warn("aborted!")
             break
 
-        if selected == "skip":
+        if selected_mode == "skip":
             utils.warn(f"skipped {p}")
             continue
 
         track_data.setdefault(name, {})
         track_data[name].setdefault(device_name, [])
 
-        utils.link(p, link_to, selected)
+        utils.link(p, link_to, selected_mode)
         track_data[name][device_name].append(p)
         utils.success(f"added {p}")
 
