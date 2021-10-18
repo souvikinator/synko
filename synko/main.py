@@ -198,6 +198,7 @@ def info(storage_path):
         utils.error(f"'{storage_path}' is used by synko, so it cannot be used")
 
     App.update_storage_path(storage_path)
+    App.update_app_data_file()
     utils.success(f"storage path updated to '{storage_path}'")
 
 

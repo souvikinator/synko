@@ -18,10 +18,10 @@ from synko.constants import (
 class Synko:
     def __init__(self):
 
-        # app data
+        # default app data
         self.__appdata = {}
         self.__appdata["PLATFORM"] = platform.system()
-        self.__appdata["UID"] = str(uuid.uuid4())
+        self.__appdata["DEVICE_NAME"] = ""
         self.__appdata["STORAGE_DIR"] = STORAGE_DIR
         self.__appdata["SYNKO_STORAGE_DIR"] = os.path.join(
             STORAGE_DIR, SYNKO_STORAGE_DIR
@@ -34,7 +34,6 @@ class Synko:
         self.__metadata = {}
         self.__metadata["APP_DATA_DIR"] = APP_DATA_DIR
         self.__metadata["APP_DATA_FILE"] = APP_DATA_FILE
-        self.__metadata["SYNKO_DEVICE_ID"] = ""
 
         # track data
         self.__trackdata = {}
@@ -43,29 +42,33 @@ class Synko:
     def init_app(self):
         """initialize synko before command execution"""
 
-        # warn: storage path does not exist, synko will create one
-        if not os.path.exists(STORAGE_DIR):
-            utils.warn(STORAGE_DIR_NOT_FOUND.format(storagepath=STORAGE_DIR))
-
-        # TODO: add a confirm prompt: yes? continue, no? sys.exit()
-
         # App data directory exists? no : create one
         os.makedirs(self.__metadata["APP_DATA_DIR"], exist_ok=True)
+
+        # warn: storage path does not exist, and take input from user
+        if not os.path.exists(STORAGE_DIR):
+            utils.info(STORAGE_DIR_NOT_FOUND.format(storagepath=STORAGE_DIR))
+
+            # ask user to enter one
+            storage_path = utils.ask_question(
+                "Enter storage path", "storage", utils.is_valid_storage_path
+            )
+            storage_path = os.path.realpath(storage_path)
+            self.update_storage_path(storage_path)
+
+        # load data from track file, if does not exist create file
+        self.__trackdata = self.__load_tracking_file()
 
         # read app data and set storage dir and track file path
         self.__appdata = self.__load_app_data()
 
-        # set device id
-        self.__metadata[
-            "SYNKO_DEVICE_ID"
-        ] = f'{self.__appdata["PLATFORM"]}~{self.__appdata["UID"]}'
+        # check if device name is assigned
+        if len(self.__appdata["DEVICE_NAME"]) == 0:
+            # TODO: give a info message
+            self.set_device_name()
 
-        # synko storage dir exists? no: create one
-        # synko storage dir is dropbox_path/synko
-        os.makedirs(self.__appdata["SYNKO_STORAGE_DIR"], exist_ok=True)
-
-        # read track data, if does not exist create one
-        self.__trackdata = self.__load_tracking_file()
+        # write to app data file
+        self.update_app_data_file()
 
         # all good to go
 
@@ -100,6 +103,26 @@ class Synko:
 
         # write to file
         utils.write_yml_file(track_data, self.__appdata["SYNKO_TRACK_FILE"])
+
+    def set_device_name(self):
+        # ask for device name
+        device_name = utils.ask_question(
+            "Enter device name", "device_name", utils.is_valid_device_name
+        )
+        if self.is_duplicate_device_name(device_name):
+            utils.error(f"device name {device_name} is already in use!")
+        self.update_device_name(device_name)
+
+    def update_device_name(self, device_name):
+        self.__appdata["DEVICE_NAME"] = device_name
+
+    def get_device_list(self):
+        device_list = []
+        for config in self.__trackdata:
+            for device in self.__trackdata[config]:
+                device_list.append(device)
+
+        return list(set(device_list))
 
     def get_metadata(self):
         return self.__metadata
@@ -160,7 +183,12 @@ class Synko:
                 self.__appdata["SYNKO_STORAGE_DIR"], SYNKO_TRACK_FILE
             )
 
-            utils.write_yml_file(self.__appdata, self.__metadata["APP_DATA_FILE"])
+    def update_app_data_file(self):
+        utils.write_yml_file(self.__appdata, self.__metadata["APP_DATA_FILE"])
+
+    def is_duplicate_device_name(self, device_name):
+        device_list = self.get_device_list()
+        return device_name in device_list
 
     def check_duplicate_paths(self, file_paths):
         """

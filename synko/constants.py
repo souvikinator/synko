@@ -65,12 +65,5 @@ visit https://github.com/souvikinator/synko/blob/master/README.md#add .
 
 STORAGE_DIR_NOT_FOUND = """storage directory '{storagepath}' not found! 
 
-Synko is explicitly going to create '{storagepath}'
-
-Make sure you have dropbox installed! If the dropbox folder is on another path
-then delete '~/Dropbox' and use following to update the path to storage folder:
-
-         synko info -p path/to/dropbox/folder
-
 for more info checkout https://github.com/souvikinator/synko/blob/master/README.md#info
 """

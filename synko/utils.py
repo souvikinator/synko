@@ -1,9 +1,49 @@
 # https://stackoverflow.com/questions/898669/how-can-i-detect-if-a-file-is-binary-non-text-in-python
 import os
+import re
 import sys
 import shutil
 import yaml
 import inquirer
+
+from synko.constants import APP_DATA_DIR
+
+
+def ask_question(msg, key, validator):
+    questions = [
+        inquirer.Text(
+            key,
+            message=msg,
+            validate=validator,
+        ),
+    ]
+
+    answers = inquirer.prompt(questions)
+    if answers[key] is None:
+        sys.exit(1)
+
+    return answers[key]
+
+
+def is_valid_storage_path(answers, storage_path):
+    if not os.path.isdir(storage_path):
+        raise inquirer.errors.ValidationError("", "storage path must be a directory")
+
+    if is_path_in_app_data_dir(storage_path, APP_DATA_DIR):
+        return inquirer.errors.ValidationError(
+            "", f"'{storage_path}' is not a valid storage path as it is used by Synko"
+        )
+
+    return True
+
+
+def is_valid_device_name(answers, device_name):
+    if not re.match("^[a-zA-Z0-9]*$", device_name):
+        raise inquirer.errors.ValidationError(
+            "", f"device name can only be alphanumeric with no spaces"
+        )
+
+    return True
 
 
 def remove_paths_in_storage_dir(config_paths, synko_storage_dir):
@@ -14,8 +54,8 @@ def remove_paths_in_storage_dir(config_paths, synko_storage_dir):
         `removed_paths (list)`: list of paths from config_paths which were removed
         `tmp_paths (list)`: list of paths from config_paths which were not removed
     """
-    removed_paths = []
     tmp_paths = []
+    removed_paths = []
 
     for p in config_paths:
         if is_path_in_storage_dir(p, synko_storage_dir):
