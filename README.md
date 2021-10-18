@@ -39,9 +39,24 @@
 
 ### add
 
+**Usage:**: `synko add [configname] [paths...]`
+
+- add file to synko
+
 ```bash
-synko add [configname] [paths...]
+synko add config1 ~/.config/random_app/test1.conf
 ```
+
+![add command 1](https://github.com/souvikinator/synko/raw/master/assets/add-cmd-1.gif)
+
+
+- adding multiple files under same config name
+
+```bash
+synko add config1 ~/.config/random_app/test1.conf ~/.config/random_app/test2.conf
+```
+
+![add command 2](https://github.com/souvikinator/synko/blob/master/assets/add-cmd-2.gif)
 
 ### index
 
@@ -57,9 +72,22 @@ synko remove [configname]
 
 ### info
 
+- **displaying current synko settings**
+
 ```bash
-synko info [options]
+synko info
 ```
+
+![info](https://github.com/souvikinator/synko/raw/master/assets/info-cmd-1.gif)
+
+- **updating storage path**
+
+```bash
+synko info -p path/to/storage/dir
+```
+in gif below synko is running in **[WSL (Windows Subsystem Linux)](https://docs.microsoft.com/en-us/windows/wsl/about)** and my dropbox folder is the Windows so I had to change the dropbox path to the one in windows for it to work properly.
+
+![info](https://github.com/souvikinator/synko/raw/master/assets/info-path-update.gif)
 
 # 🤔 FAQ
 
@@ -68,6 +96,8 @@ synko info [options]
 # ⚗️ Install
 
 Install synko with pip
+
+> **NOTE:** If on using `command not found: synko` or similar message shows up then try running the above command as root user (`sudo`)
 
 ```bash
   pip install synko
