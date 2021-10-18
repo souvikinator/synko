@@ -58,11 +58,11 @@ def add(name, paths):
 
     # form links and update track data
     for p in paths:
-        selected = 0
+        selected = 1
         link_to = utils.generate_link_path(p, app_data["SYNKO_STORAGE_DIR"])
 
-        # if link_to exists then ask for confirmation
-        if os.path.exists(link_to):
+        # if link_to exists and is not empty, then ask for confirmation
+        if os.path.exists(link_to) and (os.stat(p).st_size > 0 or any(os.scandir(p))):
             print(SYNKO_ADD_CONFLICT.format(path=p))
             selected = utils.select_option("Select option", [0, 1, "skip", "abort"])
 
