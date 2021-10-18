@@ -45,7 +45,7 @@ def add(name, paths):
     paths = list(set(paths))
     track_data = App.get_track_data()
     app_data = App.get_appdata()
-    device_id = App.device_id()
+    device_name = App.device_name()
 
     if len(paths) == 0:
         utils.error("no paths specified!")
@@ -58,7 +58,7 @@ def add(name, paths):
 
     # form links and update track data
     for p in paths:
-        selected = 1
+        selected = 0
         link_to = utils.generate_link_path(p, app_data["SYNKO_STORAGE_DIR"])
 
         # if link_to exists and is not empty, then ask for confirmation
@@ -75,10 +75,10 @@ def add(name, paths):
             continue
 
         track_data.setdefault(name, {})
-        track_data[name].setdefault(device_id, [])
+        track_data[name].setdefault(device_name, [])
 
         utils.link(p, link_to, selected)
-        track_data[name][device_id].append(p)
+        track_data[name][device_name].append(p)
         utils.success(f"added {p}")
 
     # write track data to track file
@@ -112,15 +112,15 @@ def remove(name):
     """remove specific config file from synko"""
     track_data = App.get_track_data()
     synko_storage_dir = App.get_storage_dir()
-    device_id = App.device_id()
+    device_name = App.device_name()
 
     if name not in track_data:
         utils.error(f"config name '{name}' not found")
 
-    if device_id not in track_data[name]:
+    if device_name not in track_data[name]:
         utils.error(f"nothing to remove in '{name}'")
 
-    config_paths = track_data[name][device_id] or []
+    config_paths = track_data[name][device_name] or []
 
     if len(config_paths) == 0:
         utils.error(f"nothing to remove in '{name}'")
@@ -145,7 +145,7 @@ def remove(name):
         utils.success(f"removed {p}")
 
     # update track data
-    track_data[name][device_id] = [
+    track_data[name][device_name] = [
         i for i in config_paths if i not in to_be_removed_paths
     ]
 
@@ -153,7 +153,7 @@ def remove(name):
     # device id, if not then delete the backup file
     to_be_deleted_backups = to_be_removed_paths
     for device in track_data[name]:
-        if device != device_id:
+        if device != device_name:
             for p in to_be_removed_paths:
                 if p in track_data[name][device]:
                     to_be_deleted_backups.remove(p)
@@ -163,8 +163,8 @@ def remove(name):
         utils.delete_backup(p, synko_storage_dir)
 
     # remove/delete file
-    if len(track_data[name][device_id]) == 0:
-        track_data[name].pop(device_id, None)
+    if len(track_data[name][device_name]) == 0:
+        track_data[name].pop(device_name, None)
 
     if len(track_data[name]) == 0:
         track_data.pop(name, None)

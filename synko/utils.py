@@ -19,7 +19,7 @@ def ask_question(msg, key, validator):
     ]
 
     answers = inquirer.prompt(questions)
-    if answers[key] is None:
+    if answers is None or answers[key] is None:
         sys.exit(1)
 
     return answers[key]

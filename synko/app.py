@@ -45,8 +45,11 @@ class Synko:
         # App data directory exists? no : create one
         os.makedirs(self.__metadata["APP_DATA_DIR"], exist_ok=True)
 
+        # read app data and set storage dir and track file path
+        self.__appdata = self.__load_app_data()
+        
         # warn: storage path does not exist, and take input from user
-        if not os.path.exists(STORAGE_DIR):
+        if not os.path.exists(self.__appdata["STORAGE_DIR"]):
             utils.info(STORAGE_DIR_NOT_FOUND.format(storagepath=STORAGE_DIR))
 
             # ask user to enter one
@@ -55,22 +58,22 @@ class Synko:
             )
             storage_path = os.path.realpath(storage_path)
             self.update_storage_path(storage_path)
+            utils.info(f"storage path '{storage_path}' added \n")
+        
+        # create synko storage directory if doesn't exist
+        os.makedirs(self.__appdata["SYNKO_STORAGE_DIR"], exist_ok=True)
 
         # load data from track file, if does not exist create file
         self.__trackdata = self.__load_tracking_file()
 
-        # read app data and set storage dir and track file path
-        self.__appdata = self.__load_app_data()
-
         # check if device name is assigned
         if len(self.__appdata["DEVICE_NAME"]) == 0:
-            # TODO: give a info message
+            utils.info(f"Looks like this device is not registered with synko \n")
             self.set_device_name()
+            utils.info(f"device name added: {self.__appdata['DEVICE_NAME']} \n")
 
         # write to app data file
         self.update_app_data_file()
-
-        # all good to go
 
     def __load_app_data(self):
         data = utils.read_yml_file(self.__metadata["APP_DATA_FILE"], self.__appdata)
@@ -85,8 +88,8 @@ class Synko:
 
         if len(track_data) > 0:
             for config in track_data:
-                for device_id in track_data[config]:
-                    utils.expand_all_paths(track_data[config][device_id])
+                for device_name in track_data[config]:
+                    utils.expand_all_paths(track_data[config][device_name])
 
         return track_data
 
@@ -98,8 +101,8 @@ class Synko:
 
         if len(track_data) > 0:
             for config in track_data:
-                for device_id in track_data[config]:
-                    utils.shorten_all_paths(track_data[config][device_id])
+                for device_name in track_data[config]:
+                    utils.shorten_all_paths(track_data[config][device_name])
 
         # write to file
         utils.write_yml_file(track_data, self.__appdata["SYNKO_TRACK_FILE"])
@@ -136,8 +139,8 @@ class Synko:
         # write to file
         self.__update_track_file()
 
-    def device_id(self):
-        return self.__metadata["SYNKO_DEVICE_ID"]
+    def device_name(self):
+        return self.__appdata["DEVICE_NAME"]
 
     def display_synko_info(self):
         """displays synko data/info"""
@@ -155,15 +158,15 @@ class Synko:
 
     def display_track_data(self):
         """display track data related to current device"""
-        device_id = self.device_id()
+        device_name = self.device_name()
         track_data = self.get_track_data()
         found = 0
         for config in track_data:
-            if device_id in track_data[config]:
+            if device_name in track_data[config]:
                 found += 1
                 print(f"[+] {config}")  # TODO: orange (only the config not [+])
 
-                for config_path in track_data[config][device_id]:
+                for config_path in track_data[config][device_name]:
                     print(
                         f" |__ {config_path}"
                     )  # TODO: cyan (only config_path not |__ )
@@ -198,12 +201,12 @@ class Synko:
             file_paths (list): list of file paths to configs
         """
         found = 0
-        device_id = self.device_id()
+        device_name = self.device_name()
         track_data = self.get_track_data()
 
         for config in track_data:
-            if device_id in track_data[config]:
-                existing_paths = track_data[config][device_id] or []
+            if device_name in track_data[config]:
+                existing_paths = track_data[config][device_name] or []
                 for p in existing_paths:
                     if p in file_paths:
                         found += 1
