@@ -46,27 +46,29 @@ Options:
 --version   show version number
 
 
-for detailed usage guide, go to https://github.com/souvikinator/gofuzz/blob/master/README.md
+for detailed usage guide, go to https://github.com/souvikinator/synko#-how-to-use
 """
 
 # error and warning messages
 
-SYNKO_ADD_CONFLICT = """
-CONFLICT!
-Looks like backup file of '{path}' already exists on this device and may have different content than the one on another device!
+SYNKO_ADD_CONFLICT = """CONFLICT!
+Looks like backup file of '{path}' already exists on this device 
+and may have different content than the one on another device!
 
 [0] This will possibly sync data of '{path}' on this device to another device
 
 [1] This will possibly sync data from another device with '{path}' on this device
 
-For more information select abort and visit https://github.com/souvikinator/synko/blob/master/README.md#conflict .
+For more information select abort
+visit https://github.com/souvikinator/synko/blob/master/README.md#add .
 """
 
 STORAGE_DIR_NOT_FOUND = """storage directory '{storagepath}' not found! 
 
 Synko is explicitly going to create '{storagepath}'
 
-Make sure you have dropbox installed! If the dropbox folder is on another path then use following to update the path to storage folder:
+Make sure you have dropbox installed! If the dropbox folder is on another path
+then delete '~/Dropbox' and use following to update the path to storage folder:
 
          synko info -p path/to/dropbox/folder
 

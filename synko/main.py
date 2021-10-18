@@ -56,10 +56,6 @@ def add(name, paths):
     # check if paths already exists in track file?
     App.check_duplicate_paths(paths)
 
-    # update track data and file
-    track_data.setdefault(name, {})
-    track_data[name].setdefault(device_id, [])
-
     # form links and update track data
     for p in paths:
         selected = 0
@@ -77,6 +73,9 @@ def add(name, paths):
         if selected == "skip":
             utils.warn(f"skipped {p}")
             continue
+
+        track_data.setdefault(name, {})
+        track_data[name].setdefault(device_id, [])
 
         utils.link(p, link_to, selected)
         track_data[name][device_id].append(p)
