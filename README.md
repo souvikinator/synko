@@ -15,15 +15,15 @@
 </p>
 
 <p align="center">
-  <a href="#features">Key Features</a> •
-  <a href="#how-to-use">How To Use</a> •
-  <a href="#install">Installation</a> •
-  <a href="#setup">Setup</a> •
-  <a href="#contribution">Contribution</a> •
-  <a href="#faq">FAQ</a> 
+  <a href="#features">✨ Key Features</a> •
+  <a href="#how-to-use">📑 How To Use</a> •
+  <a href="#install">⚗️ Installation</a> •
+  <a href="#setup">🛠️ Setup</a> •
+  <a href="#contribution">👨🧑 Contribution</a> •
+  <a href="#faq">🤔 FAQ</a> 
 </p>
 
-# Features
+# ✨ Features
 
 > **Synko is still in development phase and is not tested throughly**
 
@@ -35,7 +35,7 @@
 
 ![feature-1-2](https://github.com/souvikinator/synko/blob/master/assets/feature-1-2.png)
 
-# How to use
+# 📑 How to use
 
 ### add
 
@@ -61,11 +61,11 @@ synko remove [configname]
 synko info [options]
 ```
 
-# FAQ
+# 🤔 FAQ
 
 - faq
 
-# Install
+# ⚗️ Install
 
 Install synko with pip
 
@@ -73,7 +73,7 @@ Install synko with pip
   pip install synko
 ```
 
-# Setup
+# 🛠️ Setup
 
 **Install dependencies**
 
@@ -91,6 +91,6 @@ sudo python3 setup.py install
 
 now to run, directly use `synko` command.
 
-# Contribution
+# 👨🧑 Contribution
 
 > **If you are interested in helping with project development, see [contribution guide](https://github.com/souvikinator/synko/blob/master/CONTRIBUTING.md) to find a set of tips.**
