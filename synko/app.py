@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import uuid
 import platform
@@ -47,7 +48,7 @@ class Synko:
 
         # read app data and set storage dir and track file path
         self.__appdata = self.__load_app_data()
-        
+
         # warn: storage path does not exist, and take input from user
         if not os.path.exists(self.__appdata["STORAGE_DIR"]):
             utils.info(STORAGE_DIR_NOT_FOUND.format(storagepath=STORAGE_DIR))
@@ -59,7 +60,7 @@ class Synko:
             storage_path = os.path.realpath(storage_path)
             self.update_storage_path(storage_path)
             utils.info(f"storage path '{storage_path}' added \n")
-        
+
         # create synko storage directory if doesn't exist
         os.makedirs(self.__appdata["SYNKO_STORAGE_DIR"], exist_ok=True)
 
@@ -87,9 +88,9 @@ class Synko:
         track_data = utils.read_yml_file(self.__appdata["SYNKO_TRACK_FILE"])
 
         if len(track_data) > 0:
-            for config in track_data:
-                for device_name in track_data[config]:
-                    utils.expand_all_paths(track_data[config][device_name])
+            for device in track_data:
+                for config in track_data[device]:
+                    utils.expand_all_paths(track_data[device][config])
 
         return track_data
 
@@ -100,38 +101,43 @@ class Synko:
         track_data = self.__trackdata
 
         if len(track_data) > 0:
-            for config in track_data:
-                for device_name in track_data[config]:
-                    utils.shorten_all_paths(track_data[config][device_name])
+            for device in track_data:
+                for config in track_data[device]:
+                    utils.shorten_all_paths(track_data[device][config])
 
         # write to file
         utils.write_yml_file(track_data, self.__appdata["SYNKO_TRACK_FILE"])
 
     def set_device_name(self):
-        # ask for device name
+        """ask for device name and update"""
         device_name = utils.ask_question(
             "Enter device name", "device_name", utils.is_valid_device_name
         )
+
         if self.is_duplicate_device_name(device_name):
             utils.error(f"device name {device_name} is already in use!")
+
         self.update_device_name(device_name)
 
     def update_device_name(self, device_name):
         self.__appdata["DEVICE_NAME"] = device_name
 
     def get_device_list(self):
-        device_list = []
-        for config in self.__trackdata:
-            for device in self.__trackdata[config]:
-                device_list.append(device)
-
-        return list(set(device_list))
+        device_list = [device for device in self.__trackdata]
+        return device_list
 
     def get_metadata(self):
         return self.__metadata
 
     def get_storage_dir(self):
         return self.__appdata["SYNKO_STORAGE_DIR"]
+
+    def reset_app_data(self):
+        """
+        resets appdata to default values
+        except for device_name
+        """
+        shutil.rmtree(self.__metadata["APP_DATA_DIR"])
 
     # update track data
     def update_track_data(self, trackdata):
@@ -160,19 +166,24 @@ class Synko:
         """display track data related to current device"""
         device_name = self.device_name()
         track_data = self.get_track_data()
-        found = 0
-        for config in track_data:
-            if device_name in track_data[config]:
-                found += 1
-                print(f"[+] {config}")  # TODO: orange (only the config not [+])
+        found = False
+        if device_name in track_data:
+            for config in track_data[device_name]:
+                if len(track_data[device_name][config]) > 0:
+                    found = True
+                    print(f"[+] {config}")  # TODO: orange (only the config not [+])
 
-                for config_path in track_data[config][device_name]:
-                    print(
-                        f" |__ {config_path}"
-                    )  # TODO: cyan (only config_path not |__ )
+                    for config_path in track_data[device_name][config]:
+                        print(
+                            f" |__ {config_path}"
+                        )  # TODO: cyan (only config_path not |__ )
+
                 print("\n")
 
-        if not found:
+            if not found:
+                utils.error("Nothing to list")
+
+        else:
             utils.error("Nothing to list")
 
     # update storage dir
@@ -204,10 +215,9 @@ class Synko:
         device_name = self.device_name()
         track_data = self.get_track_data()
 
-        for config in track_data:
-            if device_name in track_data[config]:
-                existing_paths = track_data[config][device_name] or []
-                for p in existing_paths:
+        if device_name in track_data:
+            for config in track_data[device_name]:
+                for p in track_data[device_name][config]:
                     if p in file_paths:
                         found += 1
                         utils.warn(f"'{p}' is already added for sync under '{config}'")
