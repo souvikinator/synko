@@ -36,9 +36,9 @@ def main():
 
 # add command
 @main.command()
-@click.argument("name", nargs=1)
 @click.argument("paths", nargs=-1)
-def add(name, paths):
+@click.option("-c", "--config-name", type=str, required=True, prompt=True)
+def add(config_name, paths):
     """
     add configuration path for syncing
     """
@@ -49,6 +49,9 @@ def add(name, paths):
 
     if len(paths) == 0:
         utils.error("no paths specified!")
+
+    if len(config_name) == 0:
+        utils.error("config-name must be specified")
 
     # perform various checks and validate
     App.validate_config_paths(paths)
@@ -61,13 +64,14 @@ def add(name, paths):
         selected_mode = 0
         link_to = utils.generate_link_path(p, app_data["SYNKO_STORAGE_DIR"])
 
-        # if link_to exists and is not empty, then ask for confirmation
         if os.path.exists(link_to):
+
             if (os.path.isfile(p) and os.stat(p).st_size == 0) or (
                 os.path.isdir(p) and not any(os.scandir(p))
             ):
                 selected_mode = 1
 
+            # if link_to exists and original file/dir is not empty, then ask for confirmation
             elif (os.path.isfile(p) and os.stat(p).st_size > 0) or (
                 os.path.isdir(p) and any(os.scandir(p))
             ):
@@ -85,11 +89,11 @@ def add(name, paths):
             utils.warn(f"skipped {p}")
             continue
 
-        track_data.setdefault(name, {})
-        track_data[name].setdefault(device_name, [])
+        track_data.setdefault(device_name, {})
+        track_data[device_name].setdefault(config_name, [])
 
         utils.link(p, link_to, selected_mode)
-        track_data[name][device_name].append(p)
+        track_data[device_name][config_name].append(p)
         utils.success(f"added {p}")
 
     # write track data to track file
@@ -102,86 +106,129 @@ def add(name, paths):
 # TODO: allow users to enter config name and display
 # configs only of that specific configuration
 @main.command()
-@click.argument("name", nargs=1, required=False)
-def index(name):
+@click.option(
+    "-c",
+    "--config-name",
+    type=str,
+    required=False,
+)
+def index(config_name):
     """list all the donfig files added to synko"""
-    track_data = App.get_track_data()
-
-    if len(track_data) == 0:
-        utils.error("nothing to list")
-
+    # TODO: pass name as arg below if config_name is not None
     App.display_track_data()
 
 
 # remove command
 @main.command()
-@click.argument("name", nargs=1)
-# TODO: @click.option(
-#     "--all", "-a", is_flag=True, help="remove all config files under config name"
-# )
-def remove(name):
-    """remove specific config file from synko"""
+@click.option("-c", "--config-name", type=str, required=False)
+@click.option("-a", "--all-config", is_flag=True, default=False)
+def remove(config_name, all_config):
+    """
+    remove specific config file or all config files from synko
+
+    usage:
+        `synko remove --config-name=[configname]`: to remove files in provided configname (select from dropdown)
+        `synko remove -a/--all-config`: to remove all config added to synko in current device
+    """
     track_data = App.get_track_data()
     synko_storage_dir = App.get_storage_dir()
     device_name = App.device_name()
 
-    if name not in track_data:
-        utils.error(f"config name '{name}' not found")
+    to_be_removed_paths = []
 
-    if device_name not in track_data[name]:
-        utils.error(f"nothing to remove in '{name}'")
+    if all_config and config_name is not None:
+        utils.error("-a/--all-config and -c/--config-name can't be used together!")
 
-    config_paths = track_data[name][device_name] or []
+    # if no options is provided
+    if not all_config and config_name is None:
+        utils.error("no options provided!")
 
-    if len(config_paths) == 0:
-        utils.error(f"nothing to remove in '{name}'")
+    if config_name is not None:
 
-    # TODO: show select option only when "all" arg is not used
-    # when "all" option is used, set to_be_removed_paths=config_paths
+        if device_name not in track_data:
+            utils.error(f"nothing to remove in '{config_name}'")
 
-    # ask for user input: select config file to delete
-    to_be_removed_paths = utils.select_options(
-        "Select paths to remove (↑↓ for naivgation and → ← for select and unselect respectively)",
-        config_paths,
-    )
+        if config_name not in track_data[device_name]:
+            utils.error(f"config name '{config_name}' not found")
 
-    if len(to_be_removed_paths) == 0:
-        utils.warn("no options selected!")
-        utils.error("aborting")
+        config_paths = track_data[device_name][config_name]
 
-    # unlink src from link_to
-    for p in to_be_removed_paths:
-        link_to = utils.generate_link_path(p, synko_storage_dir)
-        utils.unlink(p, link_to)
-        utils.success(f"removed {p}")
+        if len(config_paths) == 0:
+            utils.error(f"nothing to remove in '{config_name}'")
 
-    # update track data
-    track_data[name][device_name] = [
-        i for i in config_paths if i not in to_be_removed_paths
-    ]
+        # ask for user input: select config file to delete
+        to_be_removed_paths = utils.select_options(
+            "Select paths to remove (↑↓ for naivgation and → ← for select and unselect respectively)",
+            config_paths,
+        )
 
-    # check if to_be_removed_paths are associated with any other
-    # device id, if not then delete the backup file
-    to_be_deleted_backups = to_be_removed_paths
-    for device in track_data[name]:
-        if device != device_name:
-            for p in to_be_removed_paths:
-                if p in track_data[name][device]:
-                    to_be_deleted_backups.remove(p)
-                    break
+        if len(to_be_removed_paths) == 0:
+            utils.warn("no options selected!")
+            utils.error("aborting!")
+
+        # unlink src from link_to
+        for p in to_be_removed_paths:
+            link_to = utils.generate_link_path(p, synko_storage_dir)
+            utils.unlink(p, link_to)
+            utils.success(f"removed {p}")
+
+        # update track data
+        track_data[device_name][config_name] = [
+            i for i in config_paths if i not in to_be_removed_paths
+        ]
+
+        # update track data
+        if len(track_data[device_name][config_name]) == 0:
+            del track_data[device_name][config_name]
+
+        if len(track_data[device_name]) == 0:
+            del track_data[device_name]
+
+        # check if to_be_removed_paths are associated with any other
+        # device id, if not then delete the backup file
+        to_be_deleted_backups = to_be_removed_paths
+
+        for device in track_data:
+            if device != device_name:
+                for p in to_be_removed_paths:
+                    if p in track_data[device][config_name]:
+                        to_be_deleted_backups.remove(p)
+
+    elif all_config:
+        # if -a/--all-config provided
+        # confirm first, then remove all
+        utils.info(
+            "This will remove all the config files added to synko in this device (won't affect other devices)"
+        )
+        sure = utils.select_option("Are you sure you want to proceed?", ["yes", "no"])
+        if sure == "no":
+            utils.error("aborting!")
+        else:
+            if device_name in track_data:
+                for config in track_data[device_name]:
+                    to_be_removed_paths.extend(track_data[device_name][config])
+
+                del track_data[device_name]
+
+            for path in to_be_removed_paths:
+                # unlink src from link_to
+                link_to = utils.generate_link_path(path, synko_storage_dir)
+                utils.unlink(path, link_to)
+                utils.success(f"removed {path}")
+
+            # check if to_be_removed_paths are associated with any other
+            # device id, if not then delete the backup file
+            to_be_deleted_backups = to_be_removed_paths
+            for device in track_data:
+                for config in track_data[device]:
+                    for p in to_be_removed_paths:
+                        if p in track_data[device][config]:
+                            to_be_deleted_backups.remove(p)
 
     for p in to_be_deleted_backups:
         utils.delete_backup(p, synko_storage_dir)
 
-    # remove/delete file
-    if len(track_data[name][device_name]) == 0:
-        track_data[name].pop(device_name, None)
-
-    if len(track_data[name]) == 0:
-        track_data.pop(name, None)
-
     App.update_track_data(track_data)
-
     utils.success("done!")
 
 
@@ -211,6 +258,63 @@ def info(storage_path):
     App.update_storage_path(storage_path)
     App.update_app_data_file()
     utils.success(f"storage path updated to '{storage_path}'")
+
+
+@main.command()
+def reset():
+    """
+    reset synko to the original state, all the settings will revert to default
+    will remove all the file added to synko
+    """
+    track_data = App.get_track_data()
+    synko_storage_dir = App.get_storage_dir()
+    device_name = App.device_name()
+    to_be_removed_paths = []
+
+    # confirm first
+    utils.info(
+        """This will remove all the config files added to synko in this device (won't affect other devices).
+This action will also revert the synko settings to default and unregister current device.
+Synko will be fresh as new!
+        """
+    )
+    sure = utils.select_option("Are you sure you want to proceed?", ["yes", "no"])
+    if sure == "no":
+        utils.error("aborting!")
+    else:
+
+        # unlink all files added to synko, and remove files
+        # which are not associated with any other devices
+        if device_name in track_data:
+            for config in track_data[device_name]:
+                to_be_removed_paths.extend(track_data[device_name][config])
+
+            del track_data[device_name]
+
+        for path in to_be_removed_paths:
+            # unlink src from link_to
+            link_to = utils.generate_link_path(path, synko_storage_dir)
+            utils.unlink(path, link_to)
+            utils.success(f"removed {path}")
+
+        # check if to_be_removed_paths are associated with any other
+        # device id, if not then delete the backup file
+        to_be_deleted_backups = to_be_removed_paths
+        for device in track_data:
+            for config in track_data[device]:
+                for p in to_be_removed_paths:
+                    if p in track_data[device][config]:
+                        to_be_deleted_backups.remove(p)
+
+        for p in to_be_deleted_backups:
+            utils.delete_backup(p, synko_storage_dir)
+
+        # delete the app data directory
+        App.reset_app_data()
+        # update track file with changes
+        App.update_track_data(track_data)
+
+        utils.success("done!")
 
 
 if __name__ == "__main__":
