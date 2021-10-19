@@ -36,7 +36,8 @@ Commands:
  add	add configuration to synko, first argument is name of config followed by path to config files
  remove  remove configuration from synko, takes config name as argument
  index	list all configurations added to synko
- info	list info related to synko (platform, device_id, storage name and storage path)
+ info	   list info related to synko (platform, device_id, storage name and storage path)
+ reset	reverts synko's settings to default, unregisters current device and removes all files added for sync 
 
 To know mode about specific command: synko [command] --help
 
