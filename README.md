@@ -1,3 +1,5 @@
+
+
 <h1 align="center">
   <br>
   <a href="https://github.com/souvikinator/synko"><img src="https://github.com/souvikinator/synko/blob/master/assets/logo.png" alt="synko" width="200"></a>
@@ -40,32 +42,35 @@
 
 ### add
 
-**Usage:** `synko add [configname] [paths...]`
 
-- add file to synko
+**Usage:** `synko add [paths...] --config-name="configname"`
+
+`config-name` can be anything, synko will add provided paths under the config name
+
+![add command 1](https://github.com/souvikinator/synko/blob/master/assets/add-cmd-2.gif)
+
+- **add multiple files  to synko**
+
+> **Note:** if `--config-name / -c` option is not used then it prompts to enter the config name as seen in below gif
+
+
+![add command 2](https://github.com/souvikinator/synko/raw/master/assets/add-cmd-1.gif)
+
+- **adding files under same config name**
+
+one can also add files to existing config names like so:
 
 ```bash
-synko add nvim ~/.config/nvim/init.vim
+synko add ~/.config/random_app/newfile -c existing_config_name
 ```
 
-![add command 1](https://github.com/souvikinator/synko/raw/master/assets/add-cmd-1.gif)
-
-
-- adding multiple files under same config name
-
-```bash
-synko add config1 ~/.config/random_app/test2.conf ~/.config/random_app/test3.conf
-```
-
-![add command 2](https://github.com/souvikinator/synko/blob/master/assets/add-cmd-2.gif)
-
-- synking same file in different device
+- **synking same file in different device**
 
 ![syncing across files](https://github.com/souvikinator/synko/blob/master/assets/synko-add-other-device.gif)
 
 ### index
 
-list all the added configurations and settings
+list all the added configurations
 
 **Usage:** `synko index`
 
