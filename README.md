@@ -40,79 +40,86 @@
 
 # 📑 How to use
 
-### add
-
+## Add
 
 **Usage:** `synko add [paths...] --config-name="configname"`
 
-`config-name` can be anything, synko will add provided paths under the config name
+> ### **adding files to synko**
+>`config-name` can be anything, synko will add provided paths under the config name
+>
+>![add command 1](https://github.com/souvikinator/synko/blob/master/assets/add-cmd-2.gif)
 
-![add command 1](https://github.com/souvikinator/synko/blob/master/assets/add-cmd-2.gif)
-
-- **add multiple files  to synko**
-
+> ### **add multiple files  to synko**
 > **Note:** if `--config-name / -c` option is not used then it prompts to enter the config name as seen in below gif
+>
+>![add command 2](https://github.com/souvikinator/synko/raw/master/assets/add-cmd-1.gif)
+
+> ### **adding files under same config name**
+> one can also add files to existing config names like so:
+> 
+> `synko add ~/.config/random_app/newfile -c existing_config_name`
 
 
-![add command 2](https://github.com/souvikinator/synko/raw/master/assets/add-cmd-1.gif)
+> ### **synking same file in different device**
+>![syncing across files](https://github.com/souvikinator/synko/blob/master/assets/synko-add-other-device.gif)
 
-- **adding files under same config name**
-
-one can also add files to existing config names like so:
-
-```bash
-synko add ~/.config/random_app/newfile -c existing_config_name
-```
-
-- **synking same file in different device**
-
-![syncing across files](https://github.com/souvikinator/synko/blob/master/assets/synko-add-other-device.gif)
-
-### index
-
-list all the added configurations
+## Index
 
 **Usage:** `synko index`
+> ### list all the added configurations
+>
+> `synko index`
+> 
+>![index](https://github.com/souvikinator/synko/blob/master/assets/index-cmd.gif)
 
-```bash
-synko index
-```
+## Remove
 
-![index](https://github.com/souvikinator/synko/blob/master/assets/index-cmd.gif)
+**Usage:** `synko remove [options]`
 
-### remove
+>  ### **remove specific configuration/settings file added to synko**
+> 
+> `synko remove --config-name configuration_name_here`
+>
+>   it asks to select one or multiple files one wants to remove from synko, user **right arrow key to select** and **left arrow key to unselect** , **up and down arrow key** to navigate.
+>   ![remove](https://github.com/souvikinator/synko/raw/master/assets/remove-cmd-1.gif)
 
-remove specific added configuration/settings file from synko
+If you don't want to remove any then select nothing and press enter, the process will be aborted 
 
-```bash
-synko remove [configname]
-```
-
-it asks to select one or multiple files one wants to remove from synko, user **right arrow key to select** and **left arrow key to unselect** , **up and down arrow key** to navigate.
-
-![remove](https://github.com/souvikinator/synko/raw/master/assets/remove-cmd-1.gif)
-
-If you don't want to remove any then select no options and press enter, the process will be aborted 
+> ### **remove all config files added to Synko on current device for syncing (this won't affect other devices)**
+>
+> `synko remove -a`
+>
+> ![remove all](https://github.com/souvikinator/synko/raw/master/assets/remove-all.gif)
 
 
-### info
+## Info
 
-- **displaying current synko settings**
+**Usage**: `synko info [options]`
 
-```bash
-synko info
-```
+> ### **displaying current synko settings**
+>
+>`synko info`
+>
+>![info](https://github.com/souvikinator/synko/raw/master/assets/info-cmd-1.gif)
 
-![info](https://github.com/souvikinator/synko/raw/master/assets/info-cmd-1.gif)
+>  ### **updating storage path**
+>  
+> `synko info -p path/to/storage/dir`
+>
+>![info](https://github.com/souvikinator/synko/raw/master/assets/info-path-update.gif)
+> 
+> in gif above synko is running in **[WSL (Windows Subsystem Linux)](https://docs.microsoft.com/en-us/windows/wsl/about)** and my dropbox folder is the Windows so I had to change the dropbox path to the one in windows for it to work properly.
 
-- **updating storage path**
+## Reset
 
-```bash
-synko info -p path/to/storage/dir
-```
-in gif below synko is running in **[WSL (Windows Subsystem Linux)](https://docs.microsoft.com/en-us/windows/wsl/about)** and my dropbox folder is the Windows so I had to change the dropbox path to the one in windows for it to work properly.
+**Usage**: `synko reset`
 
-![info](https://github.com/souvikinator/synko/raw/master/assets/info-path-update.gif)
+> ### Reset synko completely, (fresh as new)
+> This removes all the files added to synko on current device and also resets synko by unregistering you device and the storage path. So next time you run any synko command, you'll be prompted to register your device and if the default storage path is not found then you'll be prompted to enter storage path.
+>
+> ![reset](https://github.com/souvikinator/synko/raw/master/assets/reset-cmd.gif)
+>
+> In the gif above you can see that after reset command, the time when any other synko command is executed it prompts to register device.
 
 # 🤔 FAQ
 
