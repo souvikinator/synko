@@ -16,18 +16,15 @@
 
 <p align="center">
   <a href="#-features">✨ Key Features</a> •
-  <a href="#-how-to-use">📑 How To Use</a> •
   <a href="#%EF%B8%8F-install">⚗️ Installation</a> •
+  <a href="#-how-to-use">📑 How To Use</a> •
   <a href="#%EF%B8%8F-setup">🛠️ Setup</a> •
-  <a href="#-contribution">👨🧑 Contribution</a> •
-  <a href="#-faq">🤔 FAQ</a> 
+  <a href="#-contribution">👨🧑 Contribution</a>
 </p>
 
 # ✨ Features
 
-> **Synko is still in development phase and is not tested throughly, so it is recommended to take backup of the config files before adding to synko. As any bug may lead to loss of data**
-
-> **Work in progress for windows**
+> **Synko is still in development phase and is not tested throughly, so it is recommended to take backup of the config files before adding to synko. As any bug may lead to loss of data.**
 
 - Sync application settings and configuration files across multiple devices (linux and macos)
 - Works with dropbox as of now (support for more soon)
@@ -35,6 +32,16 @@
 - Freedom to sync specific set of files across specific set of devices. Here is an example:
 
 ![feature-1-2](https://github.com/souvikinator/synko/blob/master/assets/feature-1-2.png)
+
+# ⚗️ Install
+
+Install synko with pip
+
+> **NOTE:** If on using `command not found: synko` or similar message shows up then try running the above command as root user (`sudo`)
+
+```bash
+  pip install synko
+```
 
 # 📑 How to use
 
@@ -68,11 +75,25 @@
 >
 > `synko add ~/.config/random_app/newfile -c existing_config_name`
 
-> ### **syncing same file in different device**
+> ### **How to sync?**
 >
+> Suppose there are two devices **A** and **B**. In device **A** you added a file like so:
+>
+> **Device A**: `synko add ~/.config/random_app/a.conf --config-name=config1`
+>
+> the file will be saved under config name "**config1**". In order to sync this file with device "**B**" you need to make sure that the file with similar name (**a.conf** in this case) already exists in device "**B**". If does not exist then create an empty file.
+> After doing so you just need to add the file to synko in device **B** under the same config name used in device **A** (**config1** in this case) like so:
+>
+> **Device B**: `synko add ~/.config/random_app/a.conf --config-name=config1`
+>
+> below is a demo
 > ![syncing across device](https://github.com/souvikinator/synko/raw/master/assets/add-different-device-empty.gif)
 >
+> It may also be possible that **a.conf** already exists in device **B** with some content which may differ from the one in device **A**. Conflict arise and user is given the options to choose which one's content should be saved:
+>
 > ![syncing across device](https://github.com/souvikinator/synko/raw/master/assets/add-different-device-non-empty.gif)
+
+Current process of syncing is bit tideous as of now but more changes will be made to make the process relatively easy.
 
 ## Index
 
@@ -132,20 +153,6 @@ If you don't want to remove any then select nothing and press enter, the process
 > ![reset](https://github.com/souvikinator/synko/raw/master/assets/reset-cmd.gif)
 >
 > In the gif above you can see that after reset command, the time when any other synko command is executed it prompts to register device.
-
-# 🤔 FAQ
-
-- faq
-
-# ⚗️ Install
-
-Install synko with pip
-
-> **NOTE:** If on using `command not found: synko` or similar message shows up then try running the above command as root user (`sudo`)
-
-```bash
-  pip install synko
-```
 
 # 🛠️ Setup
 
