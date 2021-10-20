@@ -25,7 +25,7 @@
 
 # ✨ Features
 
-> **Synko is still in development phase and is not tested throughly**
+> **Synko is still in development phase and is not tested throughly, so it is recommended to take backup of the config files before adding to synko. As any bug may lead to loss of data**
 
 > **Work in progress for windows**
 
@@ -38,6 +38,14 @@
 
 # 📑 How to use
 
+> **Note**: on first usage of Synko it'll look for Dropbox directory and if not found, it will prompt to enter the path to dropbox. Also synko needs to register you device so it will prompt to enter device name which can be anything you want as long as it's not conflict with pre-registered devices. Here is how it looks:
+>
+> In gif below, synko is running in **[WSL (Windows Subsystem Linux)](https://docs.microsoft.com/en-us/windows/wsl/about)** and my dropbox folder is the Windows so I had to change the dropbox path to the one in windows for it to work properly.
+>
+> ![unregistered](https://github.com/souvikinator/synko/raw/master/assets/unregistered-device.gif)
+>
+> In case one want's to change/update the storage path then use `synko info -p path/to/storage`
+
 ## Add
 
 **Usage:** `synko add [paths...] --config-name="configname"`
@@ -46,7 +54,7 @@
 >
 > `config-name` can be anything, synko will add provided paths under the config name
 >
-> ![add command 1](https://github.com/souvikinator/synko/blob/master/assets/add-cmd-2.gif)
+> ![add command 1](https://github.com/souvikinator/synko/raw/master/assets/add-cmd-2.gif)
 
 > ### **add multiple files to synko**
 >
@@ -60,9 +68,11 @@
 >
 > `synko add ~/.config/random_app/newfile -c existing_config_name`
 
-> ### **synking same file in different device**
+> ### **syncing same file in different device**
 >
-> ![syncing across files](https://github.com/souvikinator/synko/blob/master/assets/synko-add-other-device.gif)
+> ![syncing across device](https://github.com/souvikinator/synko/raw/master/assets/add-different-device-empty.gif)
+>
+> ![syncing across device](https://github.com/souvikinator/synko/raw/master/assets/add-different-device-non-empty.gif)
 
 ## Index
 
@@ -72,7 +82,7 @@
 >
 > `synko index`
 >
-> ![index](https://github.com/souvikinator/synko/blob/master/assets/index-cmd.gif)
+> ![index](https://github.com/souvikinator/synko/raw/master/assets/index-cmd.gif)
 
 ## Remove
 
