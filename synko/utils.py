@@ -228,10 +228,10 @@ def shorten_path(file_path):
     return file_path.replace(os.path.expanduser("~"), "~")
 
 
-def generate_link_path(src_path, synko_storage_dir):
+def generate_link_path(src_path, config_name, synko_storage_dir):
     """- generate backup file path using the original file path"""
     base_name = os.path.basename(src_path)
-    return os.path.join(synko_storage_dir, base_name)
+    return os.path.join(synko_storage_dir, config_name, base_name)
 
 
 def select_option(msg, options):
@@ -330,7 +330,7 @@ def unlink(src, link_to):
         copy_path(link_to, src)
 
 
-def delete_backup(filepath, synko_storage_dir):
+def delete_backup(filepath, config_name, synko_storage_dir):
     """
     - generate backup file path (link_to) from filepath arg and delete
 
@@ -338,7 +338,7 @@ def delete_backup(filepath, synko_storage_dir):
         `filepath`: path to origin file
         `synko_storage_dir`: path to synko storage directory
     """
-    link_to = generate_link_path(filepath, synko_storage_dir)
+    link_to = generate_link_path(filepath, config_name, synko_storage_dir)
     delete_path(link_to)
 
 
