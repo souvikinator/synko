@@ -51,7 +51,7 @@ Install synko with pip
 >
 > ![unregistered](https://github.com/souvikinator/synko/raw/master/assets/unregistered-device.gif)
 >
-> In case one want's to change/update the storage path then use `synko info -p path/to/storage`
+> In case one want's to change/update the storage path anytime later then use `synko info -p path/to/storage`
 
 ## Add
 
