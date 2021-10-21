@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href="https://github.com/souvikinator/synko"><img src="https://github.com/souvikinator/synko/blob/master/assets/logo.png" alt="synko" width="200"></a>
+  <a href="https://github.com/souvikinator/synko"><img src="https://github.com/souvikinator/synko/raw/master/assets/logo.png" alt="synko" width="200"></a>
   <br>
 </h1>
 
@@ -32,7 +32,7 @@
 - User gets the freedom to add path to the config and setting files.
 - Freedom to sync specific set of files across specific set of devices. Here is an example:
 
-![feature-1-2](https://github.com/souvikinator/synko/blob/master/assets/feature-1-2.png)
+![feature-1-2](https://github.com/souvikinator/synko/raw/master/assets/feature-1-2.png)
 
 # ⚗️ Install
 
