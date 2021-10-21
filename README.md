@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href="https://github.com/souvikinator/synko"><img src="https://github.com/souvikinator/synko/raw/master/assets/logo.png" alt="synko" width="200"></a>
+  <a href="https://github.com/souvikinator/synko"><img src="https://github.com/pk-cod3ch3mist/synko/raw/master/assets/logo.svg" alt="synko" width="600"></a>
   <br>
 </h1>
 
