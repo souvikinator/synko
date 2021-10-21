@@ -18,6 +18,7 @@
   <a href="#-features">✨ Key Features</a> •
   <a href="#%EF%B8%8F-install">⚗️ Installation</a> •
   <a href="#-how-to-use">📑 How To Use</a> •
+  <a href="#-FAQ">🤔 FAQ</a> •
   <a href="#%EF%B8%8F-setup">🛠️ Setup</a> •
   <a href="#-contribution">👨🧑 Contribution</a>
 </p>
@@ -27,7 +28,7 @@
 > **Synko is still in development phase and is not tested throughly, so it is recommended to take backup of the config files before adding to synko. As any bug may lead to loss of data.**
 
 - Sync application settings and configuration files across multiple devices (linux and macos)
-- Works with dropbox as of now (support for more soon)
+- Works with dropbox (Read [FAQ](#-FAQ) to know more)
 - User gets the freedom to add path to the config and setting files.
 - Freedom to sync specific set of files across specific set of devices. Here is an example:
 
@@ -153,6 +154,12 @@ If you don't want to remove any then select nothing and press enter, the process
 > ![reset](https://github.com/souvikinator/synko/raw/master/assets/reset-cmd.gif)
 >
 > In the gif above you can see that after reset command, the time when any other synko command is executed it prompts to register device.
+
+# 🤔 FAQ
+
+## Only Dropbox supported?
+
+Well synko works with **any cloud storage syncing solution** as long as all the devices use the same solution. You just need to provide synko with the path to the folder which is getting synced by the **cloud storage syncing solution**. Dropbox is the best one to go with as it has support for mutiple platforms.
 
 # 🛠️ Setup
 
