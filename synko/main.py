@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import os
+import sys
 import click
 
 from synko import utils
@@ -335,6 +336,6 @@ Synko will be fresh as new!
 
 
 if __name__ == "__main__":
-    # TODO: get OS using platform.system()
-    # and exit if OS is not Linux/Darwin
+    if not sys.platform.startswith(("linux", "darwin")):
+        sys.exit("For the moment, synko works with Linux and macOS")
     main()
